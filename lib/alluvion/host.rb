@@ -22,7 +22,7 @@ class Alluvion::Host < String
     lambda do
       TCPSocket.new(self, port).close
       true
-    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH
       false
     end.tap { |conn| return with_timeout(conn, timeout: timeout) }
   rescue Timeout::Error
@@ -36,6 +36,6 @@ class Alluvion::Host < String
   #
   # @return [Object]
   def with_timeout(callable, timeout: 3)
-    Timeout::timeout(timeout) { callable.call }
+    Timeout.timeout(timeout) { callable.call }
   end
 end
