@@ -45,6 +45,7 @@ module Alluvion
   # @formatter:off
   {
     VERSION: 'version',
+    Config: 'config',
     Host: 'host',
     URI: 'uri'
   }.each { |s, fp| autoload(s, Pathname.new(__dir__).join("alluvion/#{fp}")) }
