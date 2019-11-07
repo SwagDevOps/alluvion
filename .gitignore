@@ -1,9 +1,10 @@
-/*.gem
+/**/*.gem
 /**/*.swp
 /**/*~
 /**/.*
 /build/
 /cache/
+/coverage/
 /doc/
 /vendor/
 !/.env
