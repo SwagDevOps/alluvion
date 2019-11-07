@@ -6,7 +6,7 @@ describe Alluvion::URI, :'alluvion/uri' do
   it { expect(subject).to respond_to(:host).with(0).arguments }
   it { expect(subject).to respond_to(:hostname).with(0).arguments }
 
-  %w[scheme user query fragment path].sort.each do |method_name|
+  %w[scheme user query fragment path port].sort.each do |method_name|
     it { expect(subject).to respond_to(method_name).with(0).arguments }
   end
 
