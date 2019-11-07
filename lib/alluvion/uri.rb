@@ -44,6 +44,10 @@ class Alluvion::URI < String
   # Get fragment
   # @return [String]
 
+  # @!method port
+  # Get port
+  # @return [String|Fixnum]
+
   def respond_to_missing?(method_name, include_private = false)
     return true if self.to_uri.respond_to?(method_name, include_private)
 
@@ -62,15 +66,12 @@ class Alluvion::URI < String
     # @return [::URI::Generic]
     def parse(uri)
       ::URI.parse(uri).tap do |result|
-        if result.hostname.nil?
-          raise ::URI::InvalidURIError, 'Can not determine hostname'
+        %w[user hostname port].sort.each do |method_name|
+          if result.public_send(method_name).nil?
+            raise ::URI::InvalidURIError, "Can not determine #{method_name}"
+          end
         end
       end
     end
   end
-
-  protected
-
-  # @return [URI::Generic]
-  attr_reader :uri
 end
