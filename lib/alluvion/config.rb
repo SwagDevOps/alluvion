@@ -14,4 +14,34 @@ class Alluvion::Config < Hash
   def initialize(config)
     config.each { |k, v| self[k] = v }
   end
+
+  def [](key)
+    key.is_a?(String) and key =~ /\./ ? dot_access(key) : super
+  end
+
+  protected
+
+  # rubocop:disable Metrics/MethodLength
+
+  # @param [String] path
+  #
+  # @return [Object]
+  def dot_access(path)
+    result = nil
+
+    self.to_h.dup.tap do |current|
+      path.split('.').tap do |parts|
+        parts.each do |k|
+          return nil unless current.key?(k)
+
+          result = current[k]
+          current = current.dup[k]
+        end
+      end
+    end
+
+    result
+  end
+
+  # rubocop:enable Metrics/MethodLength
 end
