@@ -1,0 +1,76 @@
+# frozen_string_literal: true
+
+# Copyright (C) 2017-2019 Dimitri Arrigoni <dimitri@arrigoni.me>
+# License GPLv3+: GNU GPL version 3 or later
+# <http://www.gnu.org/licenses/gpl.html>.
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+require_relative '../alluvion'
+
+# Describe an URI
+class Alluvion::URI < String
+  # @return [Alluvion::Host]
+  def hostname
+    Alluvion::Host.new(self.to_uri.hostname)
+  end
+
+  alias host hostname
+
+  # @return [::URI::Generic]
+  #
+  # @raise [::URI::InvalidURIError]
+  def to_uri
+    self.class.__send__(:parse, self)
+  end
+
+  # @!method user
+  # Get user
+  # @return [String]
+
+  # @!method scheme
+  # Get scheme
+  # @return [String]
+
+  # @!method path
+  # Get path
+  # @return [String]
+
+  # @!method query
+  # Get query
+  # @return [String]
+
+  # @!method fragment
+  # Get fragment
+  # @return [String]
+
+  def respond_to_missing?(method_name, include_private = false)
+    return true if self.to_uri.respond_to?(method_name, include_private)
+
+    super
+  end
+
+  def method_missing(method_name, *arguments, &block)
+    super unless respond_to_missing?(method_name)
+  end
+
+  class << self
+    autoload(:URI, 'uri')
+
+    # @param [String] uri
+    #
+    # @return [::URI::Generic]
+    def parse(uri)
+      ::URI.parse(uri).tap do |result|
+        if result.hostname.nil?
+          raise ::URI::InvalidURIError, 'Can not determine hostname'
+        end
+      end
+    end
+  end
+
+  protected
+
+  # @return [URI::Generic]
+  attr_reader :uri
+end
