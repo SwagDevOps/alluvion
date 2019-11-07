@@ -16,3 +16,23 @@ describe Alluvion::URI, :'alluvion/uri' do
     end
   end
 end
+
+describe Alluvion::URI, :'alluvion/uri' do
+  let(:subject) { described_class.new('ssh://user@example.org:22') }
+
+  # @formatter:off
+  {
+    host: 'example.org',
+    port: 22,
+    path: '',
+    user: 'user',
+    scheme: 'ssh',
+    query: nil,
+    fragment: nil
+  }.each do |k, v|
+    context(".#{k}") do
+      it { expect(subject.public_send(k)).to eq(v) }
+    end
+  end
+  # @formatter:on
+end
