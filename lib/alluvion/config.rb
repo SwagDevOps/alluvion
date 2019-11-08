@@ -16,7 +16,7 @@ class Alluvion::Config < Hash
   end
 
   def [](key)
-    key.is_a?(String) and key =~ /\./ ? dot_access(key) : super
+    self.key?(key) ? super : dot_access(key)
   end
 
   protected
