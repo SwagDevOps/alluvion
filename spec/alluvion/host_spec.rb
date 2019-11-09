@@ -14,7 +14,7 @@ describe Alluvion::Host, :'alluvion/host' do
     8080 => false,
   }.each do |port, v|
     context ".port_open?(#{port.inspect})" do
-      it { expect(subject.port_open?(port, timeout: 0.15)).to be(v) }
+      it { expect(subject.port_open?(port, timeout: 1.75)).to be(v) }
     end
   end
   # @formatter:on
