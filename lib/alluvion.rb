@@ -46,6 +46,7 @@ module Alluvion
   {
     VERSION: 'version',
     Config: 'config',
+    File: 'file',
     Host: 'host',
     Synchro: 'synchro',
     URI: 'uri'
