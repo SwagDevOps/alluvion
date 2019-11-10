@@ -47,6 +47,7 @@ module Alluvion
     VERSION: 'version',
     Config: 'config',
     File: 'file',
+    FileLock: 'file_lock',
     Host: 'host',
     Synchro: 'synchro',
     URI: 'uri'
