@@ -18,7 +18,7 @@ Sham.config(FactoryStruct, :configs) do |c|
           'paths' => {
             'local' => {
               'done' => '/data/complete',
-              'todo' => '/data/todo',
+              'todo' => SAMPLES_PATH.join('files'),
             },
             'remote' => {
               'done' => '/var/user/complete',
