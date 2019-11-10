@@ -1,40 +1,28 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 describe Alluvion::Config, :'alluvion/config' do
   let(:subject) do
-    # @formatter:off
-    # noinspection RubyStringKeysInHashInspection
-    {
-      'url' => 'ssh://user@example.org:22',
-      'paths' => {
-        'local' => {
-          'done' => '/data/complete',
-          'todo' => '/data/todo',
-        },
-        'remote' => {
-          'done' => '/var/user/complete',
-          'todo' => '/var/user/todo',
-        }
-      }
-
-    }.tap { |config| return described_class.new(config) }
-    # @formatter:on
-  end
-
-  # @formatter:off
-  # noinspection RubyStringKeysInHashInspection
-  {
-    'paths.local' => {
-      'done' => '/data/complete',
-      'todo' => '/data/todo'
-    },
-    'paths.local.done' => '/data/complete',
-  }.each do |k, v|
-    context ".[](#{k.inspect})" do
-      it { expect(subject[k]).to eq(v) }
+    sham!(:configs).complete.yield_self do |h|
+      described_class.new(h)
     end
   end
-  # @formatter:on
+
+  lambda do
+    # noinspection RubyStringKeysInHashInspection
+    sham!(:configs).complete.yield_self do |h|
+      # @formatter:off
+      {
+        'url' => { String => h['url'] },
+        'timeout' => { Float => h['timeout'] },
+        'paths.local' => { Hash => h['paths']['local'] },
+        'paths.local.done' => { String => h['paths']['local']['done'] },
+      }
+      # @formatter:on
+    end
+  end.call.each do |k, v|
+    context ".[](#{k.inspect})" do
+      it { expect(subject[k]).to eq(v.values[0]) }
+      it { expect(subject[k]).to be_a(v.keys[0]) }
+    end
+  end
 end
-# rubocop:enable Metrics/BlockLength
