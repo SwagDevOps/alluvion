@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Dir.glob('../lib/*.rb').map { |req| require 'req' }
+Dir.glob("#{__dir__}/../lib/*.rb").map { |req| require req }
 
 if Gem::Specification.find_all_by_name('sys-proc').any?
   require 'sys/proc'
