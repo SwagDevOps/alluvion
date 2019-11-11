@@ -52,4 +52,18 @@ module Local
       end
     end
   end
+
+  # @param [Fixnum] n
+  #
+  # @return [Array<Thread>]
+  def parallel(n, abort_on_exception: true, report_on_exception:false, &block)
+    (1..n.to_i).map do
+      Thread.new { block.call }
+    end.map do |thread|
+      thread.tap do
+        thread.abort_on_exception = abort_on_exception
+        thread.report_on_exception = report_on_exception
+      end
+    end.map(&:join)
+  end
 end
