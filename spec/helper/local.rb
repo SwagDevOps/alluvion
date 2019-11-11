@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'factory_struct'
+autoload(:FactoryStruct, "#{__dir__}/factory_struct")
 
 # Local (helper) methods
 module Local
@@ -23,7 +23,7 @@ module Local
 
     @silence_stream_mutex.synchronize do
       old_stream = stream.dup
-      # formatter:off
+      # @formatter:off
       (RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ ? 'NUL:' : '/dev/null')
         .tap { |stream_null| stream.reopen(stream_null) }
       # @formatter:on
