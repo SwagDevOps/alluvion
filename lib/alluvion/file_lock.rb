@@ -12,7 +12,6 @@ autoload(:Pathname, 'pathname')
 
 # Provide file locking (based on `flock`).
 class Alluvion::FileLock < Pathname
-  autoload(:Digest, 'digest')
   autoload(:FileUtils, 'fileutils')
   autoload(:Pathname, 'pathname')
 
@@ -20,30 +19,37 @@ class Alluvion::FileLock < Pathname
   class LockError < RuntimeError
   end
 
+  # Execute given block inside a lock, release lock after execution.
+  #
   # @return [Object]
   #
   # @raise [LockError]
   def lock!(&block)
-    File.open(prepare.to_s, File::CREAT).yield_self do |lock|
-      # returns false if already locked, 0 if not
-      lock.flock(File::LOCK_EX | File::LOCK_NB)
-    end.yield_self do |ret|
+    # returns false if already locked, 0 if not
+    lock.flock(File::LOCK_EX | File::LOCK_NB).yield_self do |ret|
       # noinspection RubySimplifyBooleanInspection
       # @formatter:off
       {
         true => -> { abort("Already locked (#{basename('.*')})") },
         false => block
-      }.fetch(false == ret).call
+      }.fetch(ret == false).call.tap { self.unlock }
       # @formatter:on
     end
   end
 
+  alias call lock!
+
   # @return [self]
   def unlock
-    self.tap { FileUtils.rm_f(self) }
+    self.tap { FileUtils.rm_f(self.to_path) }
   end
 
   protected
+
+  # @return [File]
+  def lock
+    @lock ||= File.open(prepare.to_s, File::RDWR | File::CREAT, 0o644)
+  end
 
   # @return [self]
   def prepare
