@@ -22,18 +22,16 @@ module Local
     @silence_stream_mutex ||= Mutex.new
 
     @silence_stream_mutex.synchronize do
-      begin
-        old_stream = stream.dup
-        # formatter:off
-        (RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ ? 'NUL:' : '/dev/null')
-          .tap { |stream_null| stream.reopen(stream_null) }
-        # @formatter:on
-        stream.sync = true
-        yield
-      ensure
-        stream.reopen(old_stream)
-        old_stream.close
-      end
+      old_stream = stream.dup
+      # formatter:off
+      (RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ ? 'NUL:' : '/dev/null')
+        .tap { |stream_null| stream.reopen(stream_null) }
+      # @formatter:on
+      stream.sync = true
+      yield
+    ensure
+      stream.reopen(old_stream)
+      old_stream.close
     end
   end
 
@@ -42,22 +40,23 @@ module Local
     @env_mutex ||= Mutex.new
 
     @env_mutex.synchronize do
-      begin
-        original_env = ENV.to_hash
-        ENV.replace(env)
+      original_env = ENV.to_hash
+      ENV.replace(env)
 
-        yield
-      ensure
-        ENV.replace(original_env)
-      end
+      yield
+    ensure
+      ENV.replace(original_env)
     end
   end
 
-  # @param [Fixnum] n
+  # rubocop:disable Metrics/LineLength
+
+  # @param [Fixnum] count for parallel processes
   #
   # @return [Array<Thread>]
-  def parallel(n, abort_on_exception: true, report_on_exception:false, &block)
-    (1..n.to_i).map do
+  def parallel(count, abort_on_exception: true, report_on_exception: false, &block)
+    # rubocop:enable Metrics/LineLength
+    (1..count.to_i).map do
       Thread.new { block.call }
     end.map do |thread|
       thread.tap do
