@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 autoload(:FactoryStruct, "#{__dir__}/factory_struct")
+autoload(:SafeThread, "#{__dir__}/safe_thread")
 
 # Local (helper) methods
 module Local
@@ -49,20 +50,12 @@ module Local
     end
   end
 
-  # rubocop:disable Metrics/LineLength
-
   # @param [Fixnum] count for parallel processes
   #
   # @return [Array<Thread>]
-  def parallel(count, abort_on_exception: true, report_on_exception: false, &block)
-    # rubocop:enable Metrics/LineLength
+  def parallel(count, &block)
     (1..count.to_i).map do
-      Thread.new { block.call }
-    end.map do |thread|
-      thread.tap do
-        thread.abort_on_exception = abort_on_exception
-        thread.report_on_exception = report_on_exception
-      end
+      SafeThread.new { block.call }
     end.map(&:join)
   end
 end
