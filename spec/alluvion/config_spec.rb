@@ -30,3 +30,41 @@ describe Alluvion::Config, :'alluvion/config' do
     end
   end
 end
+
+# rubocop:disable Metrics/BlockLength
+describe Alluvion::Config, :'alluvion/config' do
+  sham!(:samples).configs.fetch('complete').tap do |sample|
+    subject { described_class.read(sample.file) }
+
+    it { expect(subject).to be_a(Alluvion::Config) }
+
+    sample.read.each do |k, v|
+      context "#[#{k.inspect}]" do
+        it { expect(subject[k]).to eq(v) }
+      end
+    end
+
+    # noinspection RubyStringKeysInHashInspection
+    # @formatter:off
+    {
+      'url' => String,
+      'timeout' => Float,
+      'locks' => Hash,
+      'locks.up' => String,
+      'locks.down' => String,
+      'paths.local' => Hash,
+      'paths.local.todo' => String,
+      'paths.local.done' => String,
+      'paths.remote' => Hash,
+      'paths.remote.todo' => String,
+      'paths.remote.done' => String,
+    }.
+      # @formatter:on
+      each do |k, type|
+      context "#[#{k.inspect}]" do
+        it { expect(subject[k]).to be_a(type) }
+      end
+    end
+  end
+end
+# rubocop:enable Metrics/BlockLength
