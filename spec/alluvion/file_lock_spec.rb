@@ -4,10 +4,8 @@ autoload(:FileUtils, 'fileutils')
 autoload(:Pathname, 'pathname')
 
 describe Alluvion::FileLock, :'alluvion/file_lock' do
-  subject do
-    sham!(:configs).complete['locks']['up'].yield_self do |fp|
-      described_class.new(fp)
-    end
+  sham!(:configs).complete['locks']['up'].yield_self do |file|
+    subject { described_class.new(file) }
   end
 
   it { expect(subject).to be_a(Pathname) }
@@ -23,30 +21,31 @@ end
 describe Alluvion::FileLock, :'alluvion/file_lock' do
   sham!(:configs).complete['locks']['up'].tap do |file|
     subject { described_class.new(file) }
-
-    after(:each) { FileUtils.rm_f(file) }
-    before(:each) { FileUtils.rm_f(file) }
   end
 
   [:lock!, :call].each do |method_name|
     context "##{method_name}" do
       (1..10).each do |v|
-        it do
-          expect(subject.lock! { v }).to be(v)
-        end
+        it { expect(subject.public_send(method_name, &-> { v })).to be(v) }
       end
     end
   end
 
-  { lock!: 1.5, call: 1.5 }.each do |method_name, duration|
-    context "##{method_name}" do
-      # rubocop:disable Metrics/LineLength
-      it do
-        -> { parallel(2) { subject.public_send(method_name, &-> { sleep(duration) }) } }.tap do |callable|
-          expect { callable.call }.to raise_error(Alluvion::FileLock::LockError).with_message('Already locked (up)')
+  4.times do
+    { call: 0.75 }.each do |method_name, duration|
+      context "##{method_name}" do
+        # rubocop:disable Metrics/LineLength
+        it 'in parallel run' do
+          lambda do
+            parallel(8) { subject.public_send(method_name, &-> { sleep(duration) }) }
+          end.tap do |callable|
+            expect { callable.call }.to raise_error(Alluvion::FileLock::LockError).with_message('Already locked (up)')
+          end
+          # wait for duration ---------------------------------------
+          sleep(duration)
         end
+        # rubocop:enable Metrics/LineLength
       end
-      # rubocop:enable Metrics/LineLength
     end
   end
 end
