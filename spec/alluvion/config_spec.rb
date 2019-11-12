@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 describe Alluvion::Config, :'alluvion/config' do
+  it { expect(described_class).to respond_to(:read).with(1).arguments }
+end
+
+describe Alluvion::Config, :'alluvion/config' do
   let(:subject) do
     sham!(:configs).complete.yield_self do |h|
       described_class.new(h)
