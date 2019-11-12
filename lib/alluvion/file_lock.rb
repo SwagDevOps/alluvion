@@ -41,7 +41,11 @@ class Alluvion::FileLock < Pathname
 
   # @return [self]
   def unlock
-    self.tap { FileUtils.rm_f(self.to_path) }
+    self.tap do
+      lock.flock(File::LOCK_UN) if self.exist?
+
+      FileUtils.rm_f(self.to_path)
+    end
   end
 
   protected
