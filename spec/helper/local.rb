@@ -43,7 +43,7 @@ module Local
       original_env = ENV.to_hash
       ENV.replace(env)
 
-      yield
+      yield if block_given?
     ensure
       ENV.replace(original_env)
     end
