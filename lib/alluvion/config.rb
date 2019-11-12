@@ -19,6 +19,21 @@ class Alluvion::Config < Hash
     self.key?(key) ? super : dot_access(key)
   end
 
+  class << self
+    autoload(:YAML, 'yaml')
+
+    # @param [String] filepath
+    #
+    # @return [Hash{String => Object}|Alluvion::Config]
+    def read(filepath)
+      # @formatter:off
+      Pathname.new(filepath)
+              .yield_self { |file| YAML.safe_load(file.read) }
+              .yield_self { |config| self.new(config) }
+      # @formatter:on
+    end
+  end
+
   protected
 
   # rubocop:disable Metrics/MethodLength
