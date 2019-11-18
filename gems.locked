@@ -37,7 +37,7 @@ GEM
     method_source (0.9.2)
     mimemagic (0.3.3)
     necromancer (0.5.0)
-    parallel (1.18.0)
+    parallel (1.19.0)
     parser (2.6.5.0)
       ast (~> 2.4.0)
     pastel (0.7.3)
@@ -133,4 +133,4 @@ DEPENDENCIES
   yard-coderay (~> 0.1)
 
 BUNDLED WITH
-   2.0.1
+   2.0.2
