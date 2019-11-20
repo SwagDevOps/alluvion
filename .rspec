@@ -1,0 +1,11 @@
+# vim: ft=sh
+
+--require './spec/helper'
+--color
+--pattern './spec/**/*_spec.rb'
+--no-profile
+--order 'rand'
+
+# Local Variables:
+# mode: sh
+# End:
