@@ -15,7 +15,8 @@ class SafeThread < Thread
   end
 
   def join
-    raise_postponed_exception.yield_self { super }
+    raise_postponed_exception
+    super.tap(&:raise_postponed_exception)
   end
 
   protected
@@ -23,7 +24,7 @@ class SafeThread < Thread
   # @return [Exception|nil]
   attr_accessor :postponed_exception
 
-  # Denote has stored exception.
+  # Denote has postponed exception.
   #
   # @return [Boolean]
   def postponed_exception?
