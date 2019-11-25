@@ -14,6 +14,7 @@ autoload(:Pathname, 'pathname')
 class Alluvion::FileLock < Pathname
   autoload(:FileUtils, 'fileutils')
   autoload(:Pathname, 'pathname')
+  autoload(:Timeout, 'timeout')
 
   # Error acquiring lock.
   class LockError < RuntimeError
@@ -25,16 +26,8 @@ class Alluvion::FileLock < Pathname
   #
   # @raise [LockError]
   def lock!(&block)
-    # returns false if already locked, 0 if not
-    lock.flock(File::LOCK_EX | File::LOCK_NB).yield_self do |ret|
-      # noinspection RubySimplifyBooleanInspection
-      # @formatter:off
-      {
-        true => -> { abort("Already locked (#{basename('.*')})") },
-        false => block
-      }.fetch(ret == false).call.tap { self.unlock }
-      # @formatter:on
-    end
+    acquire_lock!
+    block.call.tap { self.unlock }
   end
 
   alias call lock!
@@ -42,7 +35,7 @@ class Alluvion::FileLock < Pathname
   # @return [self]
   def unlock
     self.tap do
-      lock.flock(File::LOCK_UN) if self.exist?
+      file.flock(File::LOCK_UN) if self.exist?
 
       FileUtils.rm_f(self.to_path)
     end
@@ -50,9 +43,18 @@ class Alluvion::FileLock < Pathname
 
   protected
 
+  # Get lock file.
+  #
   # @return [File]
-  def lock
+  def file
     @lock ||= File.open(prepare.to_s, File::RDWR | File::CREAT, 0o644)
+  end
+
+  # @raise [LockError]
+  def acquire_lock!
+    ::Timeout.timeout(0.001) { file.flock(File::LOCK_EX) }
+  rescue ::Timeout::Error
+    abort("Already locked (#{basename('.*')})")
   end
 
   # @return [self]
