@@ -20,6 +20,12 @@ class Alluvion::FileLock < Pathname
   class LockError < RuntimeError
   end
 
+  # @param [String] filepath
+  def initialize(filepath, timeout: 0.001)
+    super(filepath)
+    @timeout = timeout
+  end
+
   # Execute given block inside a lock, release lock after execution.
   #
   # @return [Object]
@@ -43,6 +49,8 @@ class Alluvion::FileLock < Pathname
 
   protected
 
+  attr_reader :timeout
+
   # Get lock file.
   #
   # @return [File]
@@ -52,7 +60,7 @@ class Alluvion::FileLock < Pathname
 
   # @raise [LockError]
   def acquire_lock!
-    ::Timeout.timeout(0.001) { file.flock(File::LOCK_EX) }
+    ::Timeout.timeout(timeout) { file.flock(File::LOCK_EX) }
   rescue ::Timeout::Error
     abort("Already locked (#{basename('.*')})")
   end
