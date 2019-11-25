@@ -32,17 +32,17 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
   end
 
   4.times do
-    { call: 0.75 }.each do |method_name, duration|
+    { call: 0.15 }.each do |method_name, duration|
       context "##{method_name}" do
         # rubocop:disable Metrics/LineLength
         it 'in parallel run' do
           lambda do
-            parallel(8) { subject.public_send(method_name, &-> { sleep(duration) }) }
+            parallel(64) { subject.public_send(method_name, &-> { sleep(duration) }) }
           end.tap do |callable|
             expect { callable.call }.to raise_error(Alluvion::FileLock::LockError).with_message('Already locked (up)')
           end
           # wait for duration ---------------------------------------
-          sleep(duration)
+          sleep(duration + 0.05)
         end
         # rubocop:enable Metrics/LineLength
       end
