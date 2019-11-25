@@ -49,6 +49,7 @@ module Alluvion
     File: 'file',
     FileLock: 'file_lock',
     Host: 'host',
+    Shell: 'shell',
     Synchro: 'synchro',
     URI: 'uri'
   }.each { |s, fp| autoload(s, Pathname.new(__dir__).join("alluvion/#{fp}")) }
