@@ -10,7 +10,21 @@ $LOAD_PATH.unshift(__dir__)
 
 # Base module (namespace)
 module Alluvion
-  autoload(:Pathname, 'pathname')
+  # @formatter:off
+  {
+    VERSION: 'version',
+    Config: 'config',
+    File: 'file',
+    FileLock: 'file_lock',
+    Host: 'host',
+    Shell: 'shell',
+    Synchro: 'synchro',
+    URI: 'uri'
+  }.each do |s, fp|
+    autoload(:Pathname, 'pathname')
+    autoload(s, Pathname.new(__dir__).join("alluvion/#{fp}"))
+  end
+  # @formatter:on
 
   class << self
     protected
@@ -20,7 +34,7 @@ module Alluvion
     # @return [Boolean]
     def bundled?
       # @formatter:off
-      [['gems.rb', 'gems.locked'], ['Gemfile', 'Gemfile.lock']].map do |m|
+      [%w[gems.rb gems.locked], %w[Gemfile Gemfile.lock]].map do |m|
         Dir.chdir("#{__dir__}/..") do
           m.map { |f| Pathname(f).file? }.uniq
         end
@@ -41,19 +55,6 @@ module Alluvion
       # @formatter:on
     end
   end
-
-  # @formatter:off
-  {
-    VERSION: 'version',
-    Config: 'config',
-    File: 'file',
-    FileLock: 'file_lock',
-    Host: 'host',
-    Shell: 'shell',
-    Synchro: 'synchro',
-    URI: 'uri'
-  }.each { |s, fp| autoload(s, Pathname.new(__dir__).join("alluvion/#{fp}")) }
-  # @formatter:on
 
   if bundled?
     require 'bundler/setup'
