@@ -10,13 +10,16 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
 
   it { expect(subject).to be_a(Pathname) }
   it { expect(subject).to respond_to(:unlock).with(0).arguments }
-
-  # rubocop:disable Metrics/LineLength
   it { expect(subject.method(:call).original_name).to eq(:lock!) }
-  specify { expect { |b| subject.public_send(:call, &b) }.to yield_with_no_args }
-  # rubocop:enable Metrics/LineLength
+  specify do
+    expect do |b|
+      sleep(0.001) # minimal lock timeout
+      subject.public_send(:call, &b)
+    end.to yield_with_no_args
+  end
 end
 
+# rubocop:disable Metrics/BlockLength
 # Example for locking -----------------------------------------------
 describe Alluvion::FileLock, :'alluvion/file_lock' do
   sham!(:configs).complete['locks']['up'].tap do |file|
@@ -26,7 +29,10 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
   [:lock!, :call].each do |method_name|
     context "##{method_name}" do
       (1..10).each do |v|
-        it { expect(subject.public_send(method_name, &-> { v })).to be(v) }
+        it do
+          sleep(0.001) # minimal lock timeout
+          expect(subject.public_send(method_name, &-> { v })).to be(v)
+        end
       end
     end
   end
@@ -49,3 +55,4 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
