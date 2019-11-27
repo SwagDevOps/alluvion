@@ -48,7 +48,7 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
             expect { callable.call }.to raise_error(Alluvion::FileLock::LockError).with_message('Already locked (up)')
           end
           # wait for duration ---------------------------------------
-          sleep(duration + 0.05)
+          sleep(duration + 0.001)
         end
         # rubocop:enable Metrics/LineLength
       end
