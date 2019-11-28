@@ -19,22 +19,27 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
   end
 end
 
-# rubocop:disable Metrics/BlockLength
-# Example for locking -----------------------------------------------
+# Examples for locking -----------------------------------------------
 describe Alluvion::FileLock, :'alluvion/file_lock' do
   sham!(:configs).complete['locks']['up'].tap do |file|
-    subject { described_class.new(file) }
+    subject { described_class.new(file, timeout: 0.25) }
   end
 
   [:lock!, :call].each do |method_name|
     context "##{method_name}" do
       (1..10).each do |v|
         it do
-          sleep(0.001) # minimal lock timeout
+          sleep(0.25) # minimal lock timeout
           expect(subject.public_send(method_name, &-> { v })).to be(v)
         end
       end
     end
+  end
+end
+
+describe Alluvion::FileLock, :'alluvion/file_lock' do
+  sham!(:configs).complete['locks']['up'].tap do |file|
+    subject { described_class.new(file, timeout: 0.001) }
   end
 
   4.times do
@@ -45,7 +50,7 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
           lambda do
             parallel(64) { subject.public_send(method_name, &-> { sleep(duration) }) }
           end.tap do |callable|
-            expect { callable.call }.to raise_error(Alluvion::FileLock::LockError).with_message('Already locked (up)')
+            expect { callable.call }.to raise_error(Alluvion::FileLock::LockError).with_message('Can not acquire lock (up)')
           end
           # wait for duration ---------------------------------------
           sleep(duration + 0.001)
@@ -55,4 +60,3 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
