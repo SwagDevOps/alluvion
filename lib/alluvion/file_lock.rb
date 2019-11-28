@@ -60,9 +60,19 @@ class Alluvion::FileLock < Pathname
 
   # @raise [LockError]
   def acquire_lock!
-    ::Timeout.timeout(timeout) { file.flock(File::LOCK_EX) }
-  rescue ::Timeout::Error
-    abort("Already locked (#{basename('.*')})")
+    # noinspection RubyBlockToMethodReference
+    Timeout.timeout(timeout) { lock_write }
+  rescue Timeout::Error
+    abort("Can not acquire lock (#{basename('.*')})")
+  end
+
+  # @return [File]
+  def lock_write
+    file.tap do |f|
+      f.write("#{$PID}\n")
+      f.flush
+      f.flock(File::LOCK_EX)
+    end
   end
 
   # @return [self]
