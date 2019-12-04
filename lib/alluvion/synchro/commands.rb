@@ -21,16 +21,27 @@ class Alluvion::Synchro::Commands < Hash
   def initialize(config)
     @config = Alluvion::Config.new(config)
     self.tap do
-      [:down].each { |k| self[k] = self.load_config(k) }
+      { down: :done } .each do |k, path|
+        self[k] = self.load_config(k).yield_self do |v|
+          path = self.config["paths.local.#{path}"]
+          path ? Alluvion::Synchro::Command.new(v, path: path) : nil
+        end
+      end
     end
   end
 
+  # Get path for commands template.
+  #
+  # @return [Pathname]
   def path
     Pathname.new(__dir__).join('commands')
   end
 
   protected
 
+  # Load command template by given name.
+  #
+  # @return [Array<String>]
   def load_config(name)
     OpenStruct.new(variables).instance_eval { binding }.yield_self do |struct|
       YAML.safe_load(path.dup.join("#{name}.yml").read).map do |arg|
@@ -39,6 +50,9 @@ class Alluvion::Synchro::Commands < Hash
     end
   end
 
+  # Get variables used in commands templating.
+  #
+  # @return [Hash{Symbol => Object}]
   def variables
     {
       url: Alluvion::URI.new(self.config['url']),
