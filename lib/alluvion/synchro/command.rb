@@ -12,9 +12,33 @@ require_relative '../synchro'
 class Alluvion::Synchro::Command < Array
   autoload(:Pathname, 'pathname')
 
-  # @param [Hash{String => Object}|Alluvion::Config] config
+  # @return [Pathname]
+  attr_reader :path
+
+  # @param [Array<String>] args
+  # @param [String] path
   def initialize(args, path: Dir.pwd)
     @path = Pathname.new(path)
     super(args)
+  end
+
+  def freeze
+    self.map(&:freeze)
+    path.freeze
+    super
+  end
+
+  # Execute command.
+  #
+  # @raise
+  # @return [Boolean]
+  def call
+    Dir.chdir(path) { sh(*self) }
+  end
+
+  protected
+
+  def sh(*args)
+    Alluvion::Shell.new.call(*args)
   end
 end
