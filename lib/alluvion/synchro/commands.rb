@@ -24,7 +24,7 @@ class Alluvion::Synchro::Commands < Hash
       { down: :done } .each do |k, path|
         self[k] = self.load_config(k).yield_self do |v|
           path = self.config["paths.local.#{path}"]
-          path ? Alluvion::Synchro::Command.new(v, path: path) : nil
+          path ? Alluvion::Synchro::Command.new(v, path: path).freeze : nil
         end
       end
     end
