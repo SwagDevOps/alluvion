@@ -1,12 +1,13 @@
 ---
 - rsync
 - -avP
-- --rsh="ssh -p'<%= url.port %>'"
+- --rsh
+- "ssh -p'<%= url.port %>'"
 - -e
 - 'ssh -o Compression=no -Tx'
 - --delete
 - --human-readable
 - --stats
 - --progress
-- "<%= url.host %>:<%= config['paths.remote.todo'] %>"
-- "<%= config['paths.local.done'] %>"
+- "<%= url.host %>:<%= config['paths.remote.done'] %>/*"
+- '.' # config['paths.local.done']
