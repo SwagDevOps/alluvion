@@ -14,7 +14,6 @@ autoload(:Pathname, 'pathname')
 class Alluvion::FileLock < Pathname
   autoload(:FileUtils, 'fileutils')
   autoload(:Pathname, 'pathname')
-  autoload(:Timeout, 'timeout')
 
   # Error acquiring lock.
   class LockError < RuntimeError
@@ -60,9 +59,10 @@ class Alluvion::FileLock < Pathname
 
   # @raise [LockError]
   def acquire_lock!
+    require 'timeout' unless defined?(::Timeout)
     # noinspection RubyBlockToMethodReference
-    Timeout.timeout(timeout) { lock_write }
-  rescue Timeout::Error
+    ::Timeout.timeout(timeout) { lock_write }
+  rescue ::Timeout::Error
     abort("Can not acquire lock (#{basename('.*')})")
   end
 
