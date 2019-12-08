@@ -5,17 +5,18 @@ autoload(:Pathname, 'pathname')
 
 describe Alluvion::FileLock, :'alluvion/file_lock' do
   sham!(:configs).complete['locks']['up'].yield_self do |file|
-    subject { described_class.new(file) }
+    subject { described_class.new(file, timeout: 0.25) }
+  end
+
+  before(:each) do
+    sleep(0.3)
   end
 
   it { expect(subject).to be_a(Pathname) }
   it { expect(subject).to respond_to(:unlock).with(0).arguments }
   it { expect(subject.method(:call).original_name).to eq(:lock!) }
   specify do
-    expect do |b|
-      sleep(0.001) # minimal lock timeout
-      subject.public_send(:call, &b)
-    end.to yield_with_no_args
+    expect { |b| subject.public_send(:call, &b) }.to yield_with_no_args
   end
 end
 
@@ -29,7 +30,7 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
     context "##{method_name}" do
       (1..10).each do |v|
         it do
-          sleep(0.25) # minimal lock timeout
+          sleep(0.3)
           expect(subject.public_send(method_name, &-> { v })).to be(v)
         end
       end
