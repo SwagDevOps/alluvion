@@ -8,9 +8,8 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
     subject { described_class.new(file, timeout: 0.25) }
   end
 
-  before(:each) do
-    sleep(0.3)
-  end
+  before(:each) { sleep(0.3) }
+  after(:each) { sleep(0.3) }
 
   it { expect(subject).to be_a(Pathname) }
   it { expect(subject).to respond_to(:unlock).with(0).arguments }
@@ -26,13 +25,13 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
     subject { described_class.new(file, timeout: 0.25) }
   end
 
+  before(:each) { sleep(0.3) }
+  after(:each) { sleep(0.3) }
+
   [:lock!, :call].each do |method_name|
     context "##{method_name}" do
       (1..10).each do |v|
-        it do
-          sleep(0.3)
-          expect(subject.public_send(method_name, &-> { v })).to be(v)
-        end
+        it { expect(subject.public_send(method_name, &-> { v })).to be(v) }
       end
     end
   end
@@ -42,6 +41,8 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
   sham!(:configs).complete['locks']['up'].tap do |file|
     subject { described_class.new(file, timeout: 0.001) }
   end
+
+  after(:each) { sleep(0.3) }
 
   4.times do
     { call: 0.15 }.each do |method_name, duration|
@@ -53,8 +54,6 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
           end.tap do |callable|
             expect { callable.call }.to raise_error(Alluvion::FileLock::LockError).with_message('Can not acquire lock (up)')
           end
-          # wait for duration ---------------------------------------
-          sleep(duration + 0.001)
         end
         # rubocop:enable Metrics/LineLength
       end
