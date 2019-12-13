@@ -5,9 +5,9 @@
 - "ssh -p'<%= url.port %>'"
 - -e
 - 'ssh -o Compression=no -Tx'
-- --delete
 - --human-readable
 - --stats
 - --progress
+- --delete
 - "<%= url.host %>:<%= config['paths.remote.done'] %>/*"
-- '.' # config['paths.local.done']
+- '.'
