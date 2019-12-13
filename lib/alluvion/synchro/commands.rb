@@ -9,6 +9,10 @@
 require_relative '../synchro'
 
 # Describe commands
+#
+# Commands are indexed by direction up/down as sequences:
+# ``Array<Alluvion::Synchro::Command>``.
+#
 class Alluvion::Synchro::Commands < Hash
   autoload(:ERB, 'erb')
   autoload(:YAML, 'yaml')
@@ -21,42 +25,81 @@ class Alluvion::Synchro::Commands < Hash
   def initialize(config)
     @config = Alluvion::Config.new(config)
     self.tap do
-      { down: :done } .each do |k, path|
-        self[k] = self.load_config(k).yield_self do |v|
-          path = self.config["paths.local.#{path}"]
-          path ? Alluvion::Synchro::Command.new(v, path: path).freeze : nil
-        end
+      { down: :done, up: :todo }.each do |k, path|
+        self[k] = make_commands(k, path)
       end
     end
   end
 
-  # Get path for commands template.
+  # Get todos (files) based on some config keys.
   #
-  # @return [Pathname]
-  def path
-    Pathname.new(__dir__).join('commands')
+  # @return [Array<String>]
+  def todos
+    (config['todo.extensions'] || ['torrents']).map do |ext|
+      pattern = Pathname.new(config['paths.local.todo']).join("*.#{ext}")
+      Dir.glob(pattern).map { |fp| Alluvion::File.new(fp) }
+         .keep_if do |f|
+        # rubocop:disable Metrics/LineLength
+        (config['todo.mime_types'] || ['application/x-bittorrent']).include?(f.mime_type)
+        # rubocop:enable Metrics/LineLength
+      end
+    end.flatten.map { |fp| fp.basename.to_s }
   end
 
   protected
 
+  # @return [Pathname]
+  def config_path
+    Pathname.new(__dir__).join('commands').freeze
+  end
+
   # Load command template by given name.
   #
-  # @return [Array<String>]
-  def load_config(name)
-    OpenStruct.new(variables).instance_eval { binding }.yield_self do |struct|
-      YAML.safe_load(path.dup.join("#{name}.yml").read).map do |arg|
-        ERB.new(arg.to_s).result(struct)
+  # @return [Array<String>|Alluvion::Synchro::Command]
+  def load_command(name, path, variables = {})
+    YAML.safe_load(config_path.dup.join("#{name}.yml").read).map do |arg|
+      ERB.new(arg.to_s).result(struct(variables))
+    end.yield_self do |args|
+      return Alluvion::Synchro::Command.new(args, path: path)
+    end
+  end
+
+  def struct(variables = {})
+    OpenStruct.new(self.variables.merge(variables)).instance_eval { binding }
+  end
+
+  # @param [Symbol] direction
+  # @param [String|Symbol] path_id
+  # @raise [ArgumentError]
+  #
+  # @return [Hash{Symbol => Array<Alluvion::Synchro::Command>}]
+  def make_commands(direction, path_id)
+    self.config["paths.local.#{path_id}"].tap do |path|
+      return nil unless path
+
+      return [load_command(direction, path)] if direction == :down
+
+      if direction == :up
+        return todos.map do |fname|
+          # rubocop:disable Metrics/LineLength
+          { file: fname }.yield_self { |variables| load_command(direction, path, variables) }
+          # rubocop:enable Metrics/LineLength
+        end
       end
     end
+
+    raise ArgumentError, "Invalid direction: #{direction.inspect}"
   end
 
   # Get variables used in commands templating.
   #
   # @return [Hash{Symbol => Object}]
   def variables
+    # @formatter:off
     {
       url: Alluvion::URI.new(self.config['url']),
       config: self.config.dup
     }
+    # @formatter:on
   end
 end
