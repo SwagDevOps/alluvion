@@ -1,0 +1,13 @@
+---
+- rsync
+- -avP
+- --rsh
+- "ssh -p'<%= url.port %>'"
+- -e
+- 'ssh -o Compression=no -Tx'
+- --remove-source-files
+- --human-readable
+- --stats
+- --progress
+- <%= file %>
+- "<%= url.host %>:<%= config['paths.remote.todo'] %>"
