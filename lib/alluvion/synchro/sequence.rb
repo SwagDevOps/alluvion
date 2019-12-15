@@ -17,10 +17,10 @@ class Alluvion::Synchro::Sequence < Array
   }.each { |s, fp| autoload(s, "#{__dir__}/sequence/#{fp}") }
   # @formatter:on
 
-  # @param [Array<Alluvion::Synchro::Command>|Array<String>] commands
+  # @param [Array<Alluvion::Synchro::Sequence::Command>|Array<String>] commands
   def initialize(commands)
     commands.map do |command|
-      Command.new(command)
+      command.is_a?(Command) ? command.dup : Command.new(command)
     end.yield_self do |args|
       super(args)
     end
