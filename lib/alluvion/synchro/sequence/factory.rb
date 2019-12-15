@@ -69,7 +69,7 @@ class Alluvion::Synchro::Sequence::Factory
     YAML.safe_load(config_path.dup.join("#{name}.yml").read).map do |arg|
       ERB.new(arg.to_s).result(struct(variables))
     end.yield_self do |args|
-      return Alluvion::Synchro::Command.new(args, path: path)
+      return Alluvion::Synchro::Sequence::Command.new(args, path: path)
     end
   end
 
