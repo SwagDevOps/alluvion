@@ -12,8 +12,6 @@ require_relative '../alluvion'
 class Alluvion::Synchro
   # @formatter:off
   {
-    Command: 'command',
-    Commands: 'commands',
     Sequence: 'sequence',
   }.each { |s, fp| autoload(s, "#{__dir__}/synchro/#{fp}") }
   # @formatter:on
@@ -24,7 +22,6 @@ class Alluvion::Synchro
   # @param [Hash|Alluvion::Config] config
   def initialize(config)
     @config = Alluvion::Config.new(config)
-    @commands = Commands.new(config)
   end
 
   # Process a down synchro
