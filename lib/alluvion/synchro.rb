@@ -14,6 +14,7 @@ class Alluvion::Synchro
   {
     Command: 'command',
     Commands: 'commands',
+    Sequence: 'sequence',
   }.each { |s, fp| autoload(s, "#{__dir__}/synchro/#{fp}") }
   # @formatter:on
 
