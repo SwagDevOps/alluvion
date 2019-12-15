@@ -12,6 +12,7 @@ require_relative '../synchro'
 class Alluvion::Synchro::Sequence < Array
   # @formatter:off
   {
+    Command: 'command',
     Factory: 'factory',
   }.each { |s, fp| autoload(s, "#{__dir__}/sequence/#{fp}") }
   # @formatter:on
@@ -19,7 +20,7 @@ class Alluvion::Synchro::Sequence < Array
   # @param [Array<Alluvion::Synchro::Command>|Array<String>] commands
   def initialize(commands)
     commands.map do |command|
-      Alluvion::Synchro::Command.new(command)
+      Command.new(command)
     end.yield_self do |args|
       super(args)
     end
