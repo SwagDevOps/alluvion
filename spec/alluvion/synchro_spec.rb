@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+# constants ---------------------------------------------------------
+describe Alluvion::Synchro, :'alluvion/synchro' do
+  it { expect(described_class).to be_const_defined(:Sequence) }
+end
+
 describe Alluvion::Synchro, :'alluvion/synchro' do
   let(:subject) { described_class.new(sham!(:configs).complete) }
 
