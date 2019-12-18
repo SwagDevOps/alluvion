@@ -24,7 +24,7 @@ describe Alluvion::Config, :'alluvion/config' do
       # @formatter:on
     end
   end.call.each do |k, v|
-    context ".[](#{k.inspect})" do
+    context "#[](#{k.inspect})" do
       it { expect(subject[k]).to eq(v.values[0]) }
       it { expect(subject[k]).to be_a(v.keys[0]) }
     end
