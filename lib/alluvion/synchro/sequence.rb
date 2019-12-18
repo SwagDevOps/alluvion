@@ -18,7 +18,7 @@ class Alluvion::Synchro::Sequence < Array
   # @formatter:on
 
   # @param [Array<Alluvion::Synchro::Sequence::Command>|Array<String>] commands
-  def initialize(commands)
+  def initialize(commands = [])
     commands.map do |command|
       command.is_a?(Command) ? command.dup : Command.new(command)
     end.yield_self do |args|
