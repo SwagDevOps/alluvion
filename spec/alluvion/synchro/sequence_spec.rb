@@ -9,11 +9,11 @@ describe Alluvion::Synchro::Sequence, :'alluvion/synchro/sequence' do
 end
 
 describe Alluvion::Synchro::Sequence, :'alluvion/synchro/sequence' do
-  sham!(:configs).complete.tap do |config|
-    subject { described_class.build(:up, config) }
-  end
-
   context '.build(:up, config)' do
+    sham!(:configs).complete.tap do |config|
+      subject { described_class.build(:up, config) }
+    end
+
     it { expect(subject).to be_a(Array) }
     it { expect(subject).to be_a(Alluvion::Synchro::Sequence) }
   end
