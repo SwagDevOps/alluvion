@@ -37,10 +37,13 @@ class Alluvion::Synchro::Sequence < Array
     # @param [Hash{String => Object}|Alluvion::Config] config
     #
     # @return [Alluvion::Synchro::Sequence]
-    #
-    # @todo raise explicit exception from factory
+    # @raise ArgumentError
     def build(name, config)
-      Factory.new(config).get(name)
+      Factory.new(config).tap do |f|
+        return f.get(name)
+      rescue KeyError => e
+        raise ArgumentError, "invalid name: #{e.key.inspect}"
+      end
     end
   end
 end
