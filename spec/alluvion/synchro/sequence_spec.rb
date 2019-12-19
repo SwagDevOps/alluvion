@@ -15,14 +15,16 @@ describe Alluvion::Synchro::Sequence, :'alluvion/synchro/sequence' do
   it { expect(subject).to respond_to(:call).with(0).arguments }
 end
 
-# .build() minimal example ----------------------------------------------------
-describe Alluvion::Synchro::Sequence, :'alluvion/synchro/sequence' do
-  context '.build(:up, config)' do
-    sham!(:configs).complete.tap do |config|
-      subject { described_class.build(:up, config) }
-    end
+# .build() minimal examples (with directions) ---------------------------------
+[:up, :down].each do |direction|
+  describe Alluvion::Synchro::Sequence, :'alluvion/synchro/sequence' do
+    context '.build(:up, config)' do
+      sham!(:configs).complete.tap do |config|
+        subject { described_class.build(direction, config) }
+      end
 
-    it { expect(subject).to be_a(Array) }
-    it { expect(subject).to be_a(Alluvion::Synchro::Sequence) }
+      it { expect(subject).to be_a(Array) }
+      it { expect(subject).to be_a(Alluvion::Synchro::Sequence) }
+    end
   end
 end
