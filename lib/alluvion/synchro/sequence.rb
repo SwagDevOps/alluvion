@@ -14,6 +14,7 @@ class Alluvion::Synchro::Sequence < Array
   {
     Command: 'command',
     Factory: 'factory',
+    NotFoundError: 'not_found_error',
   }.each { |s, fp| autoload(s, "#{__dir__}/sequence/#{fp}") }
   # @formatter:on
 
@@ -37,13 +38,9 @@ class Alluvion::Synchro::Sequence < Array
     # @param [Hash{String => Object}|Alluvion::Config] config
     #
     # @return [Alluvion::Synchro::Sequence]
-    # @raise ArgumentError
+    # @raise [Alluvion::Synchro::Sequence::NotFoundError]
     def build(name, config)
-      Factory.new(config).tap do |f|
-        return f.get(name)
-      rescue KeyError => e
-        raise ArgumentError, "invalid name: #{e.key.inspect}"
-      end
+      Factory.new(config).get(name)
     end
   end
 end
