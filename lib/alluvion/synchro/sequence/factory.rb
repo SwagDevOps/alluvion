@@ -58,9 +58,9 @@ class Alluvion::Synchro::Sequence::Factory
     (config['todo.extensions'] || ['torrents']).map do |ext|
       pattern = Pathname.new(config['paths.local.todo']).join("*.#{ext}")
       Dir.glob(pattern).map { |fp| Alluvion::File.new(fp) }.keep_if do |f|
-        # rubocop:disable Metrics/LineLength
+        # rubocop:disable Layout/LineLength
         (config['todo.mime_types'] || ['application/x-bittorrent']).include?(f.mime_type)
-        # rubocop:enable Metrics/LineLength
+        # rubocop:enable Layout/LineLength
       end
     end.flatten.map { |fp| fp.basename.to_s }
   end
@@ -99,9 +99,9 @@ class Alluvion::Synchro::Sequence::Factory
 
       if direction == :up
         return todos.map do |fname|
-          # rubocop:disable Metrics/LineLength
+          # rubocop:disable Layout/LineLength
           { file: fname }.yield_self { |variables| load_command(direction, path, variables) }
-          # rubocop:enable Metrics/LineLength
+          # rubocop:enable Layout/LineLength
         end
       end
     end
