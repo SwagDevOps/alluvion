@@ -11,14 +11,15 @@ require_relative '../sequence'
 # No entry was found in the factory.
 class Alluvion::Synchro::Sequence::NotFoundError < KeyError
   # @param [String|Symbol|Object] key
-  def initialize(key)
+  def initialize(key, message = nil)
     @key = key
+    @message = message
   end
 
   # @return [String|Symbol|Object]
   attr_reader :key
 
   def message
-    "invalid sequence name: #{key.inspect}"
+    @message || key
   end
 end
