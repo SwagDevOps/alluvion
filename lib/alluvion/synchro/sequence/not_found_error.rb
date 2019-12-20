@@ -10,7 +10,7 @@ require_relative '../sequence'
 
 # No entry was found in the factory.
 class Alluvion::Synchro::Sequence::NotFoundError < KeyError
-  # @param [String|Symbol|Object]
+  # @param [String|Symbol|Object] key
   def initialize(key)
     @key = key
   end
