@@ -28,28 +28,41 @@ class Alluvion::Synchro::Sequence::Factory
 
     # Prepare sequences ---------------------------------------------
     { down: :done, up: :todo }.each do |k, path|
-      sequences[k] = make_commands(k, path)&.yield_self do |commands|
+      @sequences[k] = make_commands(k, path)&.yield_self do |commands|
         Alluvion::Synchro::Sequence.new(commands)
       end
     end
   end
 
   # @param [String|Symbol] name
-  #  @return [Synchro::Sequence]
+  # @return [Synchro::Sequence]
   #
   # @raise [Alluvin::]Synchro::Sequence::NotFoundError]
   def get(name)
-    sequences.delete_if { |_k, v| v.nil? }.fetch(name.to_sym)
+    sequences.fetch(name.to_sym)
   rescue KeyError => e
-    Alluvion::Synchro::Sequence::NotFoundError.new(e.key).tap do |error|
-      # noinspection RubyBlockToMethodReference
-      raise error
+    "sequence not found: #{e.key.inspect}".yield_self do |message|
+      # rubocop:disable Layout/LineLength
+      Alluvion::Synchro::Sequence::NotFoundError.new(e.key, message).tap do |error|
+        # noinspection RubyBlockToMethodReference
+        raise error
+      end
+      # rubocop:enable Layout/LineLength
     end
+  end
+
+  # @param [String|Symbol] name
+  #
+  # @return [Boolean]
+  def has?(name)
+    sequences.key?(name.to_sym)
   end
 
   protected
 
-  attr_accessor :sequences
+  def sequences
+    @sequences.dup.delete_if { |_k, v| v.nil? }
+  end
 
   # Get todos (files) based on some config keys.
   #
