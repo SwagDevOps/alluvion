@@ -35,8 +35,16 @@ class Alluvion::Synchro::Sequence::Factory
   end
 
   # @param [String|Symbol] name
+  #  @return [Synchro::Sequence]
+  #
+  # @raise [Alluvin::]Synchro::Sequence::NotFoundError]
   def get(name)
     sequences.delete_if { |_k, v| v.nil? }.fetch(name.to_sym)
+  rescue KeyError => e
+    Alluvion::Synchro::Sequence::NotFoundError.new(e.key).tap do |error|
+      # noinspection RubyBlockToMethodReference
+      raise error
+    end
   end
 
   protected
