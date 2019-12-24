@@ -12,11 +12,24 @@ autoload(:Pathname, 'pathname')
 
 # Provide file locking (based on `flock`).
 class Alluvion::FileLock < Pathname
+  autoload(:Timeout, 'timeout')
   autoload(:FileUtils, 'fileutils')
   autoload(:Pathname, 'pathname')
 
   # Error acquiring lock.
   class LockError < RuntimeError
+    attr_reader :message
+
+    attr_reader :previous
+
+    def initialize(message, previous: nil)
+      @message = message.freeze
+      @previous = previous if previous.class.ancestors.include?(Exception)
+    end
+
+    def previous?
+      @previous.nil? != true
+    end
   end
 
   # @param [String] filepath
@@ -42,7 +55,7 @@ class Alluvion::FileLock < Pathname
     self.tap do
       file.flock(File::LOCK_UN) if self.exist?
 
-      FileUtils.rm_f(self.to_path)
+      fs.rm_f(self.to_path)
     end
   end
 
@@ -59,11 +72,10 @@ class Alluvion::FileLock < Pathname
 
   # @raise [LockError]
   def acquire_lock!
-    require 'timeout' unless defined?(::Timeout)
-    # noinspection RubyBlockToMethodReference
-    ::Timeout.timeout(timeout) { lock_write }
-  rescue ::Timeout::Error
-    abort("Can not acquire lock (#{basename('.*')})")
+    # noinspection RubyBlockToMethodReference,RubyResolve
+    Timeout.timeout(timeout) { lock_write }
+  rescue StandardError => e
+    abort("Can not acquire lock (#{basename('.*')})", cause: e)
   end
 
   # @return [File]
@@ -77,13 +89,17 @@ class Alluvion::FileLock < Pathname
 
   # @return [self]
   def prepare
-    self.tap { FileUtils.mkdir_p(self.dirname.to_s) }
+    self.tap { fs.mkdir_p(self.dirname.to_s) }
   end
 
   # @param [string] msg
   #
   # @raise [LockError]
-  def abort(msg)
-    raise LockError, msg
+  def abort(msg, cause: nil)
+    LockError.new(msg, previous: cause).tap { |e| raise e }
+  end
+
+  def fs
+    FileUtils
   end
 end
