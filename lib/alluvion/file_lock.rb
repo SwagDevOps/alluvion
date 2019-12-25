@@ -15,26 +15,16 @@ class Alluvion::FileLock < Pathname
   autoload(:Timeout, 'timeout')
   autoload(:FileUtils, 'fileutils')
   autoload(:Pathname, 'pathname')
-
-  # Error acquiring lock.
-  class LockError < RuntimeError
-    attr_reader :message
-
-    attr_reader :previous
-
-    def initialize(message, previous: nil)
-      @message = message.freeze
-      @previous = previous if previous.class.ancestors.include?(Exception)
-    end
-
-    def previous?
-      @previous.nil? != true
-    end
-  end
+  # @formatter:off
+  {
+    Error: 'error',
+  }.each { |s, fp| autoload(s, "#{__dir__}/file_lock/#{fp}") }
+  # @formatter:on
 
   # @param [String] filepath
   def initialize(filepath, timeout: 0.001)
     super(filepath)
+    @fs = FileUtils
     @timeout = timeout
   end
 
@@ -61,7 +51,14 @@ class Alluvion::FileLock < Pathname
 
   protected
 
+  # @return [Float]
   attr_reader :timeout
+
+  # File utility methods for copying, moving, removing, etc.
+  #
+  # @return [FileUtils]
+  # @see https://ruby-doc.org/stdlib-2.5.1/libdoc/fileutils/rdoc/FileUtils.html
+  attr_reader :fs
 
   # Get lock file.
   #
@@ -96,10 +93,6 @@ class Alluvion::FileLock < Pathname
   #
   # @raise [LockError]
   def abort(msg, cause: nil)
-    LockError.new(msg, previous: cause).tap { |e| raise e }
-  end
-
-  def fs
-    FileUtils
+    Error.new(msg, cause: cause).tap { |e| raise e }
   end
 end
