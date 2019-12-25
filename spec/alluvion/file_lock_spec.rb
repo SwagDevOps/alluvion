@@ -5,11 +5,11 @@ autoload(:Pathname, 'pathname')
 
 describe Alluvion::FileLock, :'alluvion/file_lock' do
   sham!(:configs).complete['locks']['up'].yield_self do |file|
-    subject { described_class.new(file, timeout: 0.25) }
+    subject { described_class.new(file, timeout: 0.15) }
   end
 
-  before(:each) { sleep(0.3) }
-  after(:each) { sleep(0.3) }
+  before(:each) { sleep(0.5) }
+  after(:each) { sleep(0.5) }
 
   it { expect(subject).to be_a(Pathname) }
   it { expect(subject).to respond_to(:unlock).with(0).arguments }
@@ -22,11 +22,11 @@ end
 # Examples for locking -----------------------------------------------
 describe Alluvion::FileLock, :'alluvion/file_lock' do
   sham!(:configs).complete['locks']['up'].tap do |file|
-    subject { described_class.new(file, timeout: 0.25) }
+    subject { described_class.new(file, timeout: 0.15) }
   end
 
-  before(:each) { sleep(0.3) }
-  after(:each) { sleep(0.3) }
+  before(:each) { sleep(0.5) }
+  after(:each) { sleep(0.5) }
 
   [:lock!, :call].each do |method_name|
     context "##{method_name}" do
@@ -37,26 +37,26 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
   end
 end
 
-describe Alluvion::FileLock, :'alluvion/file_lock' do
+# rubocop:disable Layout/LineLength
+describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#parallel' do
   sham!(:configs).complete['locks']['up'].tap do |file|
-    subject { described_class.new(file, timeout: 0.001) }
+    subject { described_class.new(file, timeout: 0.01) }
   end
 
-  after(:each) { sleep(0.3) }
+  after(:each) { sleep(0.5) }
 
   4.times do
-    { call: 0.15 }.each do |method_name, duration|
+    { call: 0.01 }.each do |method_name, duration|
       context "##{method_name}" do
-        # rubocop:disable Metrics/LineLength
         it 'in parallel run' do
           lambda do
             parallel(64) { subject.public_send(method_name, &-> { sleep(duration) }) }
           end.tap do |callable|
-            expect { callable.call }.to raise_error(Alluvion::FileLock::LockError).with_message('Can not acquire lock (up)')
+            expect { callable.call }.to raise_error(Alluvion::FileLock::Error).with_message('Can not acquire lock (up)')
           end
         end
-        # rubocop:enable Metrics/LineLength
       end
     end
   end
 end
+# rubocop:enable Layout/LineLength
