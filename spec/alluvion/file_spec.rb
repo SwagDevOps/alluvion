@@ -20,3 +20,20 @@ describe Alluvion::File, :'alluvion/file' do
     end
   end
 end
+
+# mtime + ctime examples --------------------------------------------
+describe Alluvion::File, :'alluvion/file' do
+  let(:subject) { described_class.new(__FILE__) }
+
+  [:mtime, :ctime].each do |method|
+    context "##{method}" do
+      it { expect(subject.public_send(method)).to be_a(Time) }
+
+      it do
+        Pathname.new(__FILE__).stat.public_send(method).tap do |expected|
+          expect(subject.public_send(method)).to eq(expected)
+        end
+      end
+    end
+  end
+end
