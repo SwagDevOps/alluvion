@@ -21,6 +21,16 @@ class Alluvion::File < Pathname
     File.open(self.to_path).yield_self { |fd| MimeMagic.by_magic(fd) }
   end
 
+  # @return [Time|nil]
+  def ctime
+    file? ? stat.ctime : nil
+  end
+
+  # @return [Time|nil]
+  def mtime
+    file? ? stat.mtime : nil
+  end
+
   # Get mime type by file content.
   #
   # @return [String]
