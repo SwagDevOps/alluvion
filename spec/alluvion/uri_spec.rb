@@ -36,3 +36,38 @@ describe Alluvion::URI, :'alluvion/uri' do
   end
   # @formatter:on
 end
+
+# example with missing method ---------------------------------------
+describe Alluvion::URI, :'alluvion/uri' do
+  let(:subject) { described_class.new('ssh://user@example.org:22') }
+
+  # undefined method `undefined_method' for "#{uri}":Alluvion::URI
+  'undefined_method'.tap do |method|
+    context "##{method}" do
+      it do
+        expect { subject.public_send(method) }.to raise_error(::NoMethodError)
+      end
+    end
+  end
+end
+
+# examples with "unparsable" URIs -----------------------------------
+describe Alluvion::URI, :'alluvion/uri' do
+  # @formatter:off
+  {
+    'ssh://example.org:22' => :user,
+    'ssh://user@example.org' => :port,
+    'ssh://user@:22' => :hostname,
+  }.each do |uri, method| # @formatter:on
+    context ".parse(#{uri.inspect})" do
+      it do
+        "can not determine `#{method}'".tap do |message|
+          # rubocop:disable Layout/LineLength
+          # noinspection RubyResolve
+          expect { described_class.parse(uri.to_s) }.to raise_error(::URI::InvalidURIError).with_message(message)
+          # rubocop:enable Layout/LineLength
+        end
+      end
+    end
+  end
+end
