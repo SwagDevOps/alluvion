@@ -10,23 +10,17 @@ require_relative '../file_lock'
 
 # Describe an error.
 class Alluvion::FileLock::Error < ::RuntimeError
-  # @return [String]
-  attr_reader :message
-
   # @param [String] message
   # @param [Exception] cause
   def initialize(message, cause: nil)
-    @message = message.freeze
-    @cause = cause if cause.class.ancestors.include?(Exception)
+    super(message)
+
+    @cause = cause if cause.class.ancestors.include?(::Exception)
   end
 
   # @return [Boolean]
   def cause?
     @cause.nil? != true
-  end
-
-  def to_s
-    message
   end
 
   # @return [Exception|nil]
