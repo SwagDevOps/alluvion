@@ -21,19 +21,27 @@ class Alluvion::Synchro::Sequence::Factory
   # @param [Hash{String => Object}|Alluvion::Config] config
   def initialize(config)
     @config = Alluvion::Config.new(config)
-    @sequences = {}
+    # @formatter:off
+    @defaults = {
+      'todo.extensions' => ['torrents'],
+      'todo.mime_types' => ['application/x-bittorrent']
+    }
+    # @formatter:on
 
     # Prepare sequences ---------------------------------------------
-    { down: :done, up: :todo }.each do |k, path|
-      @sequences[k] = make_commands(k, path)&.yield_self do |commands|
-        Alluvion::Synchro::Sequence.new(commands)
-      end
-    end
+    @sequences = make_sequences
   end
 
   # @return [Alluvion::Config]
   def config
     @config.dup
+  end
+
+  # Defaults for config missing values.
+  #
+  # @return [Hash{String => Object}]
+  def defaults
+    @defaults.dup
   end
 
   # @param [String|Symbol] name
@@ -62,16 +70,11 @@ class Alluvion::Synchro::Sequence::Factory
 
   protected
 
+  # Fetch value for given key, instead return value from defaults.
+  #
   # @param [String] key
   def fetch(key)
-    return config[key] unless config[key].nil?
-
-    # @formatter:off
-    {
-      'todo.extensions' => ['torrents'],
-      'todo.mime_types' => ['application/x-bittorrent']
-    }[key]
-    # @formatter:on
+    config[key].nil? ? defaults[key] : config[key]
   end
 
   def sequences
@@ -132,6 +135,17 @@ class Alluvion::Synchro::Sequence::Factory
     end
 
     raise ArgumentError, "Invalid direction: #{direction.inspect}"
+  end
+
+  # @return [Hash]
+  def make_sequences
+    {}.tap do |sequences|
+      { down: :done, up: :todo }.each do |k, path|
+        sequences[k] = make_commands(k, path)&.yield_self do |commands|
+          Alluvion::Synchro::Sequence.new(commands)
+        end
+      end
+    end
   end
 
   # Get variables used in commands templating.
