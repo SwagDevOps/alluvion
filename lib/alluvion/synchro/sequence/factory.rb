@@ -18,9 +18,6 @@ class Alluvion::Synchro::Sequence::Factory
   autoload(:YAML, 'yaml')
   autoload(:OpenStruct, 'ostruct')
 
-  # @return [Alluvion::Config]
-  attr_reader :config
-
   # @param [Hash{String => Object}|Alluvion::Config] config
   def initialize(config)
     @config = Alluvion::Config.new(config)
@@ -32,6 +29,11 @@ class Alluvion::Synchro::Sequence::Factory
         Alluvion::Synchro::Sequence.new(commands)
       end
     end
+  end
+
+  # @return [Alluvion::Config]
+  def config
+    @config.dup
   end
 
   # @param [String|Symbol] name
@@ -60,6 +62,18 @@ class Alluvion::Synchro::Sequence::Factory
 
   protected
 
+  # @param [String] key
+  def fetch(key)
+    return config[key] unless config[key].nil?
+
+    # @formatter:off
+    {
+      'todo.extensions' => ['torrents'],
+      'todo.mime_types' => ['application/x-bittorrent']
+    }[key]
+    # @formatter:on
+  end
+
   def sequences
     @sequences.dup.delete_if { |_k, v| v.nil? }
   end
@@ -68,14 +82,12 @@ class Alluvion::Synchro::Sequence::Factory
   #
   # @return [Array<String>]
   def todos
-    (config['todo.extensions'] || ['torrents']).map do |ext|
+    fetch('todo.extensions').map do |ext|
       pattern = Pathname.new(config['paths.local.todo']).join("*.#{ext}")
       Dir.glob(pattern).map { |fp| Alluvion::File.new(fp) }.keep_if do |f|
-        # rubocop:disable Layout/LineLength
-        (config['todo.mime_types'] || ['application/x-bittorrent']).include?(f.mime_type)
-        # rubocop:enable Layout/LineLength
+        fetch('todo.mime_types').include?(f.mime_type)
       end
-    end.flatten.map { |fp| fp.basename.to_s }
+    end.flatten.sort_by(&:ctime).map { |fp| fp.basename.to_s }
   end
 
   # @return [Pathname]
