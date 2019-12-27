@@ -72,7 +72,7 @@ class Alluvion::URI < String
       ::URI.parse(uri).tap do |result|
         %w[user hostname port].sort.each do |method_name|
           if result.public_send(method_name).nil?
-            raise ::URI::InvalidURIError, "Can not determine #{method_name}"
+            raise ::URI::InvalidURIError, "can not determine `#{method_name}'"
           end
         end
       end
