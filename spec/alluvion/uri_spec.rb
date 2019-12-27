@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# instance methods --------------------------------------------------
 describe Alluvion::URI, :'alluvion/uri' do
   let(:subject) { described_class.new('ssh://user@example.org:22') }
 
@@ -37,7 +38,7 @@ describe Alluvion::URI, :'alluvion/uri' do
   # @formatter:on
 end
 
-# example with missing method ---------------------------------------
+# example with undefined method -------------------------------------
 describe Alluvion::URI, :'alluvion/uri' do
   let(:subject) { described_class.new('ssh://user@example.org:22') }
 
@@ -58,14 +59,16 @@ describe Alluvion::URI, :'alluvion/uri' do
     'ssh://example.org:22' => :user,
     'ssh://user@example.org' => :port,
     'ssh://user@:22' => :hostname,
-  }.each do |uri, method| # @formatter:on
-    context ".parse(#{uri.inspect})" do
-      it do
-        "can not determine `#{method}'".tap do |message|
-          # rubocop:disable Layout/LineLength
-          # noinspection RubyResolve
-          expect { described_class.parse(uri.to_s) }.to raise_error(::URI::InvalidURIError).with_message(message)
-          # rubocop:enable Layout/LineLength
+  }.each do |uri, keyword| # @formatter:on
+    [:parse, :new].each do |method|
+      "can not determine `#{keyword}'".tap do |message|
+        context ".#{method}(#{uri.inspect})" do
+          it do
+            # noinspection RubyResolve,RubyYardParamTypeMatch
+            # rubocop:disable Layout/LineLength
+            expect { described_class.parse(uri) }.to raise_error(::URI::InvalidURIError).with_message(message)
+            # rubocop:enable Layout/LineLength
+          end
         end
       end
     end
