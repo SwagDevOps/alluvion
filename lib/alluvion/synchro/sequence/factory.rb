@@ -134,7 +134,7 @@ class Alluvion::Synchro::Sequence::Factory
       end
     end
 
-    raise ArgumentError, "Invalid direction: #{direction.inspect}"
+    raise ArgumentError, "invalid direction #{direction.inspect}"
   end
 
   # @return [Hash]
