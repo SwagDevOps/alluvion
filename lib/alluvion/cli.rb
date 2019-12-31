@@ -49,13 +49,17 @@ class Alluvion::Cli
   protected
 
   # @return [Class|Thor]
+  #
+  # @see Thor.register()
+  # @see https://github.com/erikhuda/thor/blob/99330185faa6ca95e57b19a402dfe52b1eba8901/lib/thor.rb#L30
   def callable
     self.class.__send__(:autoload, :Thor, 'thor')
 
     Class.new(Thor).tap do |klass|
       self.commands.each do |command|
         command.commands.to_h.each do |name, c|
-          klass.register(command, name, c.usage, c.description, c.options)
+          klass.__send__(:desc, c.usage, c.description, c.options)
+          klass.define_method(name) { |*args| invoke(c, args) }
         end
       end
     end
