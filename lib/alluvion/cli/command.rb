@@ -18,5 +18,14 @@ class Alluvion::Cli
   #
   # @abstract
   class Command < Thor
+    class << self
+      # @see https://github.com/erikhuda/thor/blob/99330185faa6ca95e57b19a402dfe52b1eba8901/lib/thor.rb#L127
+      def method_options(**options)
+        super(options)
+      end
+
+      # @see https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/
+      alias options method_options
+    end
   end
 end
