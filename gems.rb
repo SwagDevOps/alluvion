@@ -7,7 +7,7 @@ group :default do
   gem 'kamaze-version', '~> 1.0'
   gem 'mimemagic', '~> 0.3'
   gem 'sys-proc', '~> 1.1'
-  gem 'thor', '~> 0.20'
+  gem 'thor', '~> 1.0'
 end
 
 group :development do
