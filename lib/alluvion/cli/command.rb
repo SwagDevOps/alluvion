@@ -25,7 +25,8 @@ class Alluvion::Cli
         config[:shell] ||= Thor::Base.shell.new
         dispatch(nil, given_args.dup, nil, config)
       rescue Thor::UndefinedCommandError => e
-        on_undefined_commamnd(e, config[:shell])
+        config[:shell].error(e.message)
+        exit(Errno::EINVAL::Errno)
       rescue Thor::Error => e
         config[:debug] || ENV['THOR_DEBUG'] == '1' ? (raise e) : config[:shell].error(e.message)
         exit(false)
@@ -36,6 +37,7 @@ class Alluvion::Cli
         # computation will not occur.
         exit(true)
       end
+
       # rubocop:enable Layout/LineLength
 
       # @see https://github.com/erikhuda/thor/blob/99330185faa6ca95e57b19a402dfe52b1eba8901/lib/thor.rb#L127
@@ -45,19 +47,6 @@ class Alluvion::Cli
 
       # @see https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/
       alias options method_options
-
-      protected
-
-      # @param [Exception] error
-      # @param [Thor::Shell::Basic] shell
-      #
-      # @raise [SystemExit]
-      def on_undefined_commamnd(error, shell)
-        shell.error(error.message)
-        help(shell)
-
-        exit(Errno::EINVAL::Errno)
-      end
     end
   end
 end
