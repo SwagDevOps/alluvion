@@ -15,6 +15,17 @@ class Alluvion::Cli
 
     # @type [Array<Class>]
     attr_accessor :commands
+
+    # Denote given class is a command.
+    #
+    # @param [Class] klass
+    def command?(klass)
+      return false if klass == Command
+
+      return false unless klass.respond_to?(:ancestors)
+
+      klass.ancestors.include?(Command)
+    end
   end
 
   @commands = []
@@ -26,12 +37,7 @@ class Alluvion::Cli
   }.each do |s, fp|
     autoload(s, Pathname.new(__dir__).join("cli/#{fp}"))
 
-    self.const_get(s).tap do |klass|
-      next if klass == Command
-      next unless klass.respond_to?(:ancestors)
-
-      self.commands.push(klass) if klass.ancestors.include?(Command)
-    end
+    self.const_get(s).tap { |klass| self.commands.push(klass) if command?(klass) } # rubocop:disable Layout/LineLength
   end
   # @formatter:on
 
