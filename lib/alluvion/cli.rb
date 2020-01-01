@@ -11,21 +11,28 @@ require_relative '../alluvion'
 # Entrypoint for CLI.
 class Alluvion::Cli
   class << self
-    protected
-
-    # @type [Array<Class>]
-    attr_accessor :commands
-
     # Denote given class is a command.
     #
     # @param [Class] klass
+    # @return [Boolean]
     def command?(klass)
-      return false if klass == Command
-
-      return false unless klass.respond_to?(:ancestors)
-
-      klass.ancestors.include?(Command)
+      # noinspection RubyYardReturnMatch
+      Command.tap do |base|
+        # @formatter:off
+        return {
+          true => -> { false },
+          false => lambda do
+            klass.respond_to?(:ancestors) and klass.ancestors.include?(base)
+          end
+        }.fetch(klass == base).call
+        # @formatter:on
+      end
     end
+
+    protected
+
+    # @type [Array<Command|Class>]
+    attr_accessor :commands
   end
 
   @commands = []
