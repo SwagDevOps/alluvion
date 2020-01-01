@@ -26,7 +26,12 @@ class Alluvion::Cli
   }.each do |s, fp|
     autoload(s, Pathname.new(__dir__).join("cli/#{fp}"))
 
-    self.commands.push(self.const_get(s)) if s.to_s =~ /[A-Z].+Command/
+    self.const_get(s).tap do |klass|
+      next if klass == Command
+      next unless klass.respond_to?(:ancestors)
+
+      self.commands.push(klass) if klass.ancestors.include?(Command)
+    end
   end
   # @formatter:on
 
