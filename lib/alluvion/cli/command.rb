@@ -21,6 +21,14 @@ class Alluvion::Cli
     class << self
       # rubocop:disable Layout/LineLength
 
+      # Parse the command and options from the given args, and invoke the command.
+      #
+      # @param [Array<String>] given_args
+      # @param [Hash{Symbol => Object}] config
+      #
+      # @raise [SystemExit]
+      #
+      # @see https://github.com/erikhuda/thor/blob/master/lib/thor/base.rb#L475
       def start(given_args = ARGV, config = {})
         config[:shell] ||= Thor::Base.shell.new
         dispatch(nil, given_args.dup, nil, config)
