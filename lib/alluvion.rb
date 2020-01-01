@@ -13,6 +13,7 @@ module Alluvion
   # @formatter:off
   {
     VERSION: 'version',
+    Cli: 'cli',
     Config: 'config',
     File: 'file',
     FileLock: 'file_lock',
