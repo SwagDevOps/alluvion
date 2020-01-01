@@ -78,7 +78,7 @@ class Alluvion::Cli
   def command(given_args = ARGV.dup)
     require 'dry/inflector'
 
-    Class.new(Thor).tap do |klass|
+    Class.new(Command).tap do |klass|
       self.commands.each do |command|
         Dry::Inflector.new.underscore(command.name.split('::').last).split('_')[0..-2].fetch(0).tap do |ns| # rubocop:disable Layout/LineLength
           command.commands.to_h.each do |name, c|
