@@ -9,5 +9,15 @@
 require_relative 'command'
 
 # Up command
-class Alluvion::Cli::UpCommand < Alluvion::Cli::Command
+class Alluvion::Cli::SynchroCommand < Alluvion::Cli::Command
+  desc 'up', 'Execute synchro up'
+  option :delete,
+         aliases: '-d',
+         desc: 'Delete the file after parsing it',
+         type: :boolean,
+         default: false
+
+  def up
+    # @todo implement method
+  end
 end

@@ -36,7 +36,7 @@ class Alluvion::Cli
   #
   # @return [void]
   def call(given_args = ARGV.dup)
-    callable.start(given_args)
+    command(given_args).start(given_args)
   end
 
   # Get available commands (as classes)
@@ -50,16 +50,17 @@ class Alluvion::Cli
 
   # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
 
-  # Build callable commands.
+  # Build callable command.
   #
   # @return [Class|Thor]
   #
   # @see Thor.register()
   # @see https://github.com/erikhuda/thor/blob/99330185faa6ca95e57b19a402dfe52b1eba8901/lib/thor.rb#L30
-  def callable
+  # #see https://github.com/erikhuda/thor/wiki/Method-Options
+  def command(given_args = ARGV.dup)
     require 'dry/inflector'
 
-    Class.new(Command).tap do |klass|
+    Class.new(Thor).tap do |klass|
       self.commands.each do |command|
         Dry::Inflector.new.underscore(command.name.split('::').last).split('_')[0..-2].fetch(0).tap do |ns| # rubocop:disable Layout/LineLength
           command.commands.to_h.each do |name, c|
@@ -72,11 +73,18 @@ class Alluvion::Cli
                 required: v.required,
                 type: v.type,
                 repeatable: v.repeatable,
+                default: v.default,
+                lazy_default: v.lazy_default,
+                enum: v.enum,
               }.tap { |option| klass.__send__(:option, option_name, option) }
             end
             # @formatter:on
 
-            klass.define_method("#{ns}:#{name}") { |*args| invoke(c, args) }
+            klass.define_method("#{ns}:#{name}") do |*|
+              (given_args[0] == "#{ns}:#{name}" ? given_args[1..-1] : given_args).yield_self do |args| # rubocop:disable Layout/LineLength
+                return command.start([name].concat(args))
+              end
+            end
           end
         end
       end

@@ -24,7 +24,7 @@ class Alluvion::Cli
       def start(given_args = ARGV, config = {})
         config[:shell] ||= Thor::Base.shell.new
         dispatch(nil, given_args.dup, nil, config)
-      rescue Thor::UndefinedCommandError => e
+      rescue Thor::UndefinedCommandError, Thor::InvocationError => e
         config[:shell].error(e.message)
         exit(Errno::EINVAL::Errno)
       rescue Thor::Error => e
@@ -40,13 +40,12 @@ class Alluvion::Cli
 
       # rubocop:enable Layout/LineLength
 
-      # @see https://github.com/erikhuda/thor/blob/99330185faa6ca95e57b19a402dfe52b1eba8901/lib/thor.rb#L127
-      def method_options(**options)
-        super(options)
+      def method_option(name, **options)
+        super(name, options)
       end
 
       # @see https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/
-      alias options method_options
+      alias option method_option
     end
   end
 end
