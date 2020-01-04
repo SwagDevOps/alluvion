@@ -28,3 +28,17 @@ end
     end
   end
 end
+
+describe Alluvion::Synchro::Sequence, :'alluvion/synchro/sequence' do
+  context '.build(:wrong, config)' do
+    it do
+      # rubocop:disable Layout/LineLength
+      expect do
+        sham!(:configs).complete.tap do |config|
+          described_class.build(:wrong, config)
+        end
+      end.to raise_error(Alluvion::Synchro::Sequence::NotFoundError, "sequence not found: #{:wrong.inspect}")
+      # rubocop:enable Layout/LineLength
+    end
+  end
+end
