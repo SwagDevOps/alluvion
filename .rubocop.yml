@@ -4,3 +4,4 @@ inherit_gem:
     - .rubocop.yml
 AllCops:
   TargetRubyVersion: 2.5
+Style/BracesAroundHashParameters: { Enabled: false }
