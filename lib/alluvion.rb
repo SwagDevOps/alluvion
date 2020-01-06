@@ -15,6 +15,7 @@ module Alluvion
     VERSION: 'version',
     Cli: 'cli',
     Config: 'config',
+    ConfigFile: 'config_file',
     File: 'file',
     FileLock: 'file_lock',
     Host: 'host',
