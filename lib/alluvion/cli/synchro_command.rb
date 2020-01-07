@@ -8,16 +8,51 @@
 
 require_relative 'command'
 
-# Up command
+# Synchro command
+#
+# Expose up and down synchros.
 class Alluvion::Cli::SynchroCommand < Alluvion::Cli::Command
-  desc 'up', 'Execute synchro up'
-  option :delete,
-         aliases: '-d',
-         desc: 'Delete the file after parsing it',
-         type: :boolean,
-         default: false
+  class << self
+    protected
+
+    # @return [Array]
+    def config_option_args
+      # @formatter:off
+      [:config, {
+        aliases: '-c',
+        desc: 'Load given config file',
+        type: :string,
+        default: Alluvion::ConfigFile.new.to_s
+      }]
+      # @formatter:on
+    end
+  end
+
+  desc 'up', 'Execute synchro (up)'
+  config_option_args.tap { |args| option(args[0], **args[1]) }
 
   def up
-    # @todo implement method
+    configure(options).yield_self do
+      # @todo implement method
+    end
+  end
+
+  desc 'down', 'Execute synchro (down)'
+  config_option_args.tap { |args| option(args[0], **args[1]) }
+
+  def down
+    configure(options).yield_self do
+      # @todo implement method
+    end
+  end
+
+  protected
+
+  # @return [Alluvion::Config]
+  attr_accessor :config
+
+  # @param {Hash} options
+  def configure(options)
+    self.tap { self.config = Alluvion::ConfigFile.new(*options[:config]).parse }
   end
 end
