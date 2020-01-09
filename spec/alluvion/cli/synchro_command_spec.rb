@@ -19,3 +19,16 @@ describe Alluvion::Cli::SynchroCommand, :'alluvion/cli/synchro_command' do
     it { expect(subject).to respond_to(command).with(0).arguments }
   end
 end
+
+describe Alluvion::Cli::SynchroCommand, :'alluvion/cli/synchro_command' do
+  let(:file) { sham!(:samples).configs.fetch('complete').file }
+  subject do
+    described_class.new.tap do |command| # (args, options, config)
+      command.__send__(:configure, { config: file })
+    end
+  end
+
+  context '#config' do
+    it { expect(subject.__send__(:config)).to be_a(Alluvion::Config) }
+  end
+end
