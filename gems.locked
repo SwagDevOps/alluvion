@@ -38,7 +38,7 @@ GEM
     mimemagic (0.3.3)
     necromancer (0.5.1)
     parallel (1.19.1)
-    parser (2.7.0.1)
+    parser (2.7.0.2)
       ast (~> 2.4.0)
     pastel (0.7.3)
       equatable (~> 0.6)
@@ -105,7 +105,7 @@ GEM
     unicode-display_width (1.6.0)
     unicode_utils (1.4.0)
     wisper (2.0.1)
-    yard (0.9.23)
+    yard (0.9.24)
     yard-coderay (0.1.0)
       coderay
       yard
