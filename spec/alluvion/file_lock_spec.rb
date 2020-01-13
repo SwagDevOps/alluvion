@@ -71,7 +71,7 @@ describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#paralle
             locker.call(subject) do
               subject.public_send(method_name, &-> { sleep(duration) })
             end
-          end.to raise_error(Alluvion::FileLock::Error).with_message('Can not acquire lock (up)')
+          end.to raise_error(Alluvion::FileLock::Error).with_message('can not acquire lock (up)')
         end
       end
     end

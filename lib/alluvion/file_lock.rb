@@ -13,7 +13,7 @@ autoload(:Pathname, 'pathname')
 # Provide file locking (based on `flock`).
 class Alluvion::FileLock < Pathname
   autoload(:FileUtils, 'fileutils')
-  autoload(:Pathname, 'pathname')
+
   # @formatter:off
   {
     Error: 'error',
@@ -70,7 +70,7 @@ class Alluvion::FileLock < Pathname
 
   # @raise [LockError]
   def acquire_lock!
-    abort("Can not acquire lock (#{basename('.*')})") if locked?
+    abort("can not acquire lock (#{basename('.*')})") if locked?
 
     lock_write
   end
