@@ -12,7 +12,6 @@ autoload(:Pathname, 'pathname')
 
 # Provide file locking (based on `flock`).
 class Alluvion::FileLock < Pathname
-  autoload(:Timeout, 'timeout')
   autoload(:FileUtils, 'fileutils')
   autoload(:Pathname, 'pathname')
   # @formatter:off
@@ -22,10 +21,15 @@ class Alluvion::FileLock < Pathname
   # @formatter:on
 
   # @param [String] filepath
-  def initialize(filepath, timeout: 0.001)
+  def initialize(filepath)
     super(filepath)
     @fs = FileUtils
-    @timeout = timeout
+  end
+
+  def locked?
+    # returns false if already locked, 0 if not
+    # noinspection RubySimplifyBooleanInspection
+    file.flock(File::LOCK_EX | File::LOCK_NB) == false
   end
 
   # Execute given block inside a lock, release lock after execution.
@@ -35,7 +39,7 @@ class Alluvion::FileLock < Pathname
   # @raise [LockError]
   def lock!(&block)
     acquire_lock!
-    block.call.tap { self.unlock }
+    block.call.tap { self.unlock } if block
   end
 
   alias call lock!
@@ -43,16 +47,13 @@ class Alluvion::FileLock < Pathname
   # @return [self]
   def unlock
     self.tap do
-      file.flock(File::LOCK_UN) if self.exist?
+      file.tap { |f| f.flock(File::LOCK_UN) }
 
-      fs.rm_f(self.to_path)
+      fs.rm_f(self.to_path) if self.exist?
     end
   end
 
   protected
-
-  # @return [Float]
-  attr_reader :timeout
 
   # File utility methods for copying, moving, removing, etc.
   #
@@ -64,23 +65,23 @@ class Alluvion::FileLock < Pathname
   #
   # @return [File]
   def file
-    @lock ||= File.open(prepare.to_s, File::RDWR | File::CREAT, 0o644)
+    @file ||= File.open(prepare.to_s, File::RDWR | File::CREAT, 0o644)
   end
 
   # @raise [LockError]
   def acquire_lock!
-    # noinspection RubyBlockToMethodReference,RubyResolve
-    Timeout.timeout(timeout) { lock_write }
-  rescue StandardError => e
-    abort("Can not acquire lock (#{basename('.*')})", cause: e)
+    abort("Can not acquire lock (#{basename('.*')})") if locked?
+
+    lock_write
   end
 
   # @return [File]
   def lock_write
+    # return  file.flock(File::LOCK_EX).tap { |f| pp(f) }
     file.tap do |f|
+      f.flock(File::LOCK_EX)
       f.write("#{$PID}\n")
       f.flush
-      f.flock(File::LOCK_EX)
     end
   end
 
