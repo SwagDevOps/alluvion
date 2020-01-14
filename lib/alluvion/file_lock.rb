@@ -26,6 +26,9 @@ class Alluvion::FileLock < Pathname
     @fs = FileUtils
   end
 
+  # Denote is locked.
+  #
+  # @return [Boolean]
   def locked?
     # returns false if already locked, 0 if not
     # noinspection RubySimplifyBooleanInspection
@@ -35,7 +38,6 @@ class Alluvion::FileLock < Pathname
   # Execute given block inside a lock, release lock after execution.
   #
   # @return [Object]
-  #
   # @raise [LockError]
   def lock!(&block)
     acquire_lock!
@@ -68,7 +70,9 @@ class Alluvion::FileLock < Pathname
     @file ||= File.open(prepare.to_s, File::RDWR | File::CREAT, 0o644)
   end
 
-  # @raise [LockError]
+  # @return [File]
+  #
+  # @raise [Error]
   def acquire_lock!
     abort("can not acquire lock (#{basename('.*')})") if locked?
 
@@ -77,7 +81,6 @@ class Alluvion::FileLock < Pathname
 
   # @return [File]
   def lock_write
-    # return  file.flock(File::LOCK_EX).tap { |f| pp(f) }
     file.tap do |f|
       f.flock(File::LOCK_EX)
       f.write("#{$PID}\n")
