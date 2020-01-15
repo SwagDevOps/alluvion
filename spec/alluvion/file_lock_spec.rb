@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-autoload(:FileUtils, 'fileutils')
 autoload(:Pathname, 'pathname')
 autoload(:SecureRandom, 'securerandom')
 
