@@ -13,7 +13,6 @@ describe Alluvion::FileLock, :'alluvion/file_lock' do
 
   it { expect(subject).to be_a(Pathname) }
   it { expect(subject).to respond_to(:unlock).with(0).arguments }
-  it { expect(subject).to respond_to(:locked?).with(0).arguments }
 
   it { expect(subject.method(:call).original_name).to eq(:lock!) }
   [:lock!, :call].each do |method_name|
