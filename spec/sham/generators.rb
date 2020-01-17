@@ -2,7 +2,7 @@
 
 autoload(:SecureRandom, 'securerandom')
 
-Sham.config(FactoryStruct, :generator) do |c|
+Sham.config(FactoryStruct, :generators) do |c|
   # rubocop:disable Layout/LineLength
   c.attributes do
     # @formatter:off
