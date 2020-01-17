@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 autoload(:Pathname, 'pathname')
-autoload(:SecureRandom, 'securerandom')
 
 # rubocop:disable Layout/LineLength
 describe Alluvion::FileLock, :'alluvion/file_lock' do
@@ -38,11 +37,11 @@ describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#call' d
     context "##{method_name}" do
       after(:each) { subject.unlock }
 
-      (1..10).each do |v|
+      sham!(:generators).counter.call(10).each do |v|
         it { expect(subject.public_send(method_name, &-> { v })).to be(v) }
       end
 
-      (1..10).map { SecureRandom.urlsafe_base64(9) }.each do |v|
+      sham!(:generators).randomizer.call(10).each do |v|
         it { expect(subject.public_send(method_name, &-> { v })).to be(v) }
       end
     end
@@ -68,11 +67,11 @@ describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#paralle
   end
 
   20.times do
-    { call: 0.01 }.each do |method_name, duration|
-      context "##{method_name}" do
+    { call: 0.01 }.each do |method, duration|
+      context "##{method}" do
         it 'in parallel run' do
           expect do
-            locker.call(subject) { subject.public_send(method_name, &-> { sleep(duration) }) }
+            locker.call(subject) { subject.public_send(method, &-> { sleep(duration) }) }
           end.to raise_error(Alluvion::FileLock::Error).with_message('can not acquire lock (up)')
         end
       end
