@@ -31,7 +31,7 @@ class Alluvion::Cli
       # @see https://github.com/erikhuda/thor/blob/master/lib/thor/base.rb#L475
       def start(given_args = ARGV, config = {})
         config[:shell] ||= Thor::Base.shell.new
-        dispatch(nil, given_args.dup, nil, config)
+        handle_interrupt(config) { dispatch(nil, given_args.dup, nil, config) }
       rescue Thor::UndefinedCommandError, Thor::InvocationError => e
         config[:shell].error(e.message)
         exit(Errno::EINVAL::Errno)
@@ -47,6 +47,25 @@ class Alluvion::Cli
       end
 
       # rubocop:enable Layout/LineLength
+
+      def handle_interrupt(config = {}, &block)
+        block.call if block # rubocop:disable Style/SafeNavigation
+      rescue Interrupt
+        Process.kill(:HUP, -pgid)
+        exit(0)
+      rescue SignalException => e
+        config[:shell].error("Interrupted by signal (#{e.signo})")
+        Process.kill(:HUP, -pgid)
+        exit(Errno::ESRCH::Errno)
+      end
+
+      def pid
+        (require 'English').yield_self { $PID }
+      end
+
+      def pgid
+        Process.getpgid(pid)
+      end
 
       def method_option(name, **options)
         super(name, options)
