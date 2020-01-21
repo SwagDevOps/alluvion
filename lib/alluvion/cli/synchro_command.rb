@@ -31,19 +31,17 @@ class Alluvion::Cli::SynchroCommand < Alluvion::Cli::Command
   desc 'up', 'Execute synchro (up)'
   config_option_args.tap { |args| option(args[0], **args[1]) }
 
+  # @see Alluvion.Synchro#up
   def up
-    configure(options).yield_self do
-      # @todo implement method
-    end
+    configure(options).yield_self { synchro.public_send(__method__) }
   end
 
   desc 'down', 'Execute synchro (down)'
   config_option_args.tap { |args| option(args[0], **args[1]) }
 
+  # @see Alluvion::Synchro#down
   def down
-    configure(options).yield_self do
-      # @todo implement method
-    end
+    configure(options).yield_self { synchro.public_send(__method__) }
   end
 
   protected
@@ -54,5 +52,12 @@ class Alluvion::Cli::SynchroCommand < Alluvion::Cli::Command
   # @param {Hash} options
   def configure(options)
     self.tap { self.config = Alluvion::ConfigFile.new(*options[:config]).parse }
+  end
+
+  # Get a new instance of synchro.
+  #
+  # @return [Alluvion::Synchro]
+  def synchro
+    Alluvion::Synchro.new(config)
   end
 end
