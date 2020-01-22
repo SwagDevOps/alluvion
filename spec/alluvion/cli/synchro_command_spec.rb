@@ -31,4 +31,8 @@ describe Alluvion::Cli::SynchroCommand, :'alluvion/cli/synchro_command' do
   context '#config' do
     it { expect(subject.__send__(:config)).to be_a(Alluvion::Config) }
   end
+
+  context '#synchro' do
+    it { expect(subject.__send__(:synchro)).to be_a(Alluvion::Synchro) }
+  end
 end
