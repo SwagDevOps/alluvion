@@ -19,6 +19,9 @@ class Alluvion::Synchro
   # @param [Hash|Alluvion::Config] config
   def initialize(config)
     @config = Alluvion::Config.new(config)
+    @sequences = [:up, :down].sort.map do |direction|
+      [direction, Alluvion::Synchro::Sequence.build(direction, self.config)]
+    end.to_h
   end
 
   # Process a down synchro
@@ -26,8 +29,7 @@ class Alluvion::Synchro
   # @raise [RuntimeError] when connection is not available
   def down
     sequences.fetch(__method__).tap do |sequence|
-      with_connection do
-      end
+      with_connection {}
     end
   end
 
@@ -36,8 +38,7 @@ class Alluvion::Synchro
   # @raise [RuntimeError] when connection is not available
   def up
     sequences.fetch(__method__).tap do |sequence|
-      with_connection do
-      end
+      with_connection {}
     end
   end
 
@@ -46,6 +47,11 @@ class Alluvion::Synchro
   # @return [Alluvion::Config]
   attr_reader :config
 
+  # Get commands sequences.
+  #
+  # @return [Hash{Symbol => Synchro::Sequence}]
+  attr_reader :sequences
+
   def with_connection(&block)
     Alluvion::URI.new(config['url']).tap do |uri|
       unless uri.host.port_open?(uri.port, timeout: config['timeout'] || 1)
@@ -53,15 +59,6 @@ class Alluvion::Synchro
       end
 
       return block.call
-    end
-  end
-
-  # Get commands sequences.
-  #
-  # @return [Hash{Symbol => Synchro::Sequence}]
-  def sequences
-    Alluvion::Synchro::Sequence::Factory.new(config).yield_self do |f|
-      [:up, :down].sort.map { |direction| [direction, f.get(direction)] }.to_h
     end
   end
 end
