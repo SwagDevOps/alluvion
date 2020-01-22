@@ -16,9 +16,6 @@ class Alluvion::Synchro
   }.each { |s, fp| autoload(s, "#{__dir__}/synchro/#{fp}") }
   # @formatter:on
 
-  # @return [Commands]
-  attr_reader :commands
-
   # @param [Hash|Alluvion::Config] config
   def initialize(config)
     @config = Alluvion::Config.new(config)
@@ -28,14 +25,20 @@ class Alluvion::Synchro
   #
   # @raise [RuntimeError] when connection is not available
   def down
-    with_connection {}
+    sequences.fetch(__method__).tap do |sequence|
+      with_connection do
+      end
+    end
   end
 
   # Process a up synchro
   #
   # @raise [RuntimeError] when connection is not available
   def up
-    with_connection {}
+    sequences.fetch(__method__).tap do |sequence|
+      with_connection do
+      end
+    end
   end
 
   protected
@@ -50,6 +53,15 @@ class Alluvion::Synchro
       end
 
       return block.call
+    end
+  end
+
+  # Get commands sequences.
+  #
+  # @return [Hash{Symbol => Synchro::Sequence}]
+  def sequences
+    Alluvion::Synchro::Sequence::Factory.new(config).yield_self do |f|
+      [:up, :down].sort.map { |direction| [direction, f.get(direction)] }.to_h
     end
   end
 end
