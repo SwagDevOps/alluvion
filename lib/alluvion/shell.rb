@@ -19,8 +19,8 @@ class Alluvion::Shell
 
   # @return [Boolean]
   def call(*args)
-    [self.env].concat(*args).yield_self do |params|
-      system(params) || -> { raise args.inspect }.call
+    [self.env].concat(args).yield_self do |params|
+      system(*params) || -> { raise args.inspect }.call
     end
   end
 
