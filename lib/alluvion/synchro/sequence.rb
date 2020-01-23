@@ -28,7 +28,7 @@ class Alluvion::Synchro::Sequence < Array
   end
 
   def call
-    # @todo implement sequence execution
+    self.map(&:call)
   end
 
   class << self
