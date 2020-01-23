@@ -33,7 +33,7 @@ class Alluvion::Cli::SynchroCommand < Alluvion::Cli::Command
 
   # @see Alluvion.Synchro#up
   def up
-    configure(options).yield_self { synchro.public_send(__method__) }
+    configure(options).yield_self { synchro.call(__method__) }
   end
 
   desc 'down', 'Execute synchro (down)'
@@ -41,7 +41,7 @@ class Alluvion::Cli::SynchroCommand < Alluvion::Cli::Command
 
   # @see Alluvion::Synchro#down
   def down
-    configure(options).yield_self { synchro.public_send(__method__) }
+    configure(options).yield_self { synchro.call(__method__) }
   end
 
   protected

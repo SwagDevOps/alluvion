@@ -24,21 +24,12 @@ class Alluvion::Synchro
     end.to_h
   end
 
-  # Process a down synchro
-  #
-  # @raise [RuntimeError] when connection is not available
-  def down
-    sequences.fetch(__method__).tap do |sequence|
-      with_connection {}
-    end
-  end
-
   # Process a up synchro
   #
   # @raise [RuntimeError] when connection is not available
-  def up
-    sequences.fetch(__method__).tap do |sequence|
-      with_connection {}
+  def call(direction)
+    sequences.fetch(direction.to_sym).tap do |sequence|
+      with_connection { sequence.call }
     end
   end
 
