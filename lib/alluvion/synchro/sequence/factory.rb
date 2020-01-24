@@ -90,7 +90,7 @@ class Alluvion::Synchro::Sequence::Factory
       Dir.glob(pattern).map { |fp| Alluvion::File.new(fp) }.keep_if do |f|
         fetch('todo.mime_types').include?(f.mime_type)
       end
-    end.flatten.sort_by(&:ctime).map { |fp| fp.basename.to_s }
+    end.flatten.sort_by(&:ctime).reverse.map { |fp| fp.basename.to_s }
   end
 
   # @return [Pathname]
