@@ -100,6 +100,7 @@ class Alluvion::Synchro::Sequence::Factory
 
   # Load command template by given name.
   #
+  # @todo Use commands from config
   # @return [Array<String>|Alluvion::Synchro::Command]
   def load_command(name, path, variables = {})
     YAML.safe_load(config_path.dup.join("#{name}.yml").read).map do |arg|
