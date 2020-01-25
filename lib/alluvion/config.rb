@@ -9,18 +9,45 @@
 require_relative '../alluvion'
 
 # Describe a config
+#
+# Config keys
 class Alluvion::Config < Hash
+  # Provide ``ENV ``variables access in config template.
+  #
+  # To aceess an env variable, use ``@``.
+  #
+  # Examples: ``USER``, ``TIMEOUT`` and ``HOME``:
+  #
+  # ```yaml
+  # ---
+  # url: 'ssh://<%= @USER %>@example.org:22'
+  # timeout: <%= @TIMEOUT || 1.5 %>
+  # paths:
+  #   local:
+  #     done: "<%= @HOME %>/Downloads/complete"
+  #     todo: "<%= @HOME %>/Downloads"
+  # ```
+  #
+  # @return [Hash{Symbol => Object}]
+  attr_reader :env
+
   # @param [Hash] config
-  def initialize(config)
+  def initialize(config, env: nil)
     config.each { |k, v| self[k] = v }
+
+    @env = (env || self.class.__send__(:env)).freeze
   end
 
   def [](key)
-    self.key?(key) ? super : dot_access(key)
+    (self.key?(key) ? super : dot_access(key)).yield_self do |value|
+      self.class.template(value, env: self.env)
+    end
   end
 
   class << self
     autoload(:YAML, 'yaml')
+    autoload(:ERB, 'erb')
+    autoload(:OpenStruct, 'ostruct')
 
     # @param [String] filepath
     #
@@ -31,6 +58,35 @@ class Alluvion::Config < Hash
               .yield_self { |file| YAML.safe_load(file.read) }
               .yield_self { |config| self.new(config) }
       # @formatter:on
+    end
+
+    # @param [Object] value
+    #
+    # @return [Object]
+    def template(value, env: self.env)
+      return value unless value.is_a?(String)
+
+      (OpenStruct.new(env).instance_eval { binding }).tap do |vars|
+        return ERB.new(value.to_s).result(vars)
+      end
+    end
+
+    protected
+
+    # @return [Hash]
+    def env
+      ENV.to_h.to_a.map do |k, v|
+        # @formatter:off
+        [
+          "@#{k}".to_sym,
+          lambda do
+            YAML.safe_load(v)
+          rescue Psych::Exception
+            v
+          end.call
+        ]
+        # @formatter:on
+      end.to_h
     end
   end
 
