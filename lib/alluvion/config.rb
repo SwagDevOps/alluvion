@@ -29,6 +29,9 @@ class Alluvion::Config < Hash
   # ```
   #
   # @return [Hash{Symbol => Object}]
+  #
+  # @see .template
+  # @see #[]
   attr_reader :env
 
   # @param [Hash] config
