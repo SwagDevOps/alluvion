@@ -35,6 +35,7 @@ class Alluvion::Config < Hash
   attr_reader :env
 
   # @param [Hash] config
+  # @param [Hash|nil] env
   def initialize(config, env: nil)
     config.each { |k, v| self[k] = v }
 
@@ -49,8 +50,7 @@ class Alluvion::Config < Hash
 
   class << self
     autoload(:YAML, 'yaml')
-    autoload(:ERB, 'erb')
-    autoload(:OpenStruct, 'ostruct')
+    autoload(:BabyErubis, 'baby_erubis')
 
     # @param [String] filepath
     #
@@ -69,8 +69,10 @@ class Alluvion::Config < Hash
     def template(value, env: self.env)
       return value unless value.is_a?(String)
 
-      (OpenStruct.new(env).instance_eval { binding }).tap do |vars|
-        return ERB.new(value.to_s).result(vars)
+      BabyErubis::Text.new.from_str(value.to_s).render(env).yield_self do |v|
+        YAML.safe_load(v)
+      rescue Psych::Exception
+        v
       end
     end
 
@@ -81,7 +83,7 @@ class Alluvion::Config < Hash
       ENV.to_h.to_a.map do |k, v|
         # @formatter:off
         [
-          "@#{k}".to_sym,
+          k.to_sym,
           lambda do
             YAML.safe_load(v)
           rescue Psych::Exception

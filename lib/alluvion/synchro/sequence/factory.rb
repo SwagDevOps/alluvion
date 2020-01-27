@@ -14,9 +14,8 @@ require_relative '../sequence'
 # ``Array<Alluvion::Synchro::Command>``.
 #
 class Alluvion::Synchro::Sequence::Factory
-  autoload(:ERB, 'erb')
+  autoload(:BabyErubis, 'baby_erubis')
   autoload(:YAML, 'yaml')
-  autoload(:OpenStruct, 'ostruct')
 
   # @param [Hash{String => Object}|Alluvion::Config] config
   def initialize(config)
@@ -100,19 +99,15 @@ class Alluvion::Synchro::Sequence::Factory
 
   # Load command template by given name.
   #
-  # @todo Use commands from config
   # @return [Array<String>|Alluvion::Synchro::Command]
   def load_command(name, path, variables = {})
-    YAML.safe_load(config_path.dup.join("#{name}.yml").read).map do |arg|
-      ERB.new(arg.to_s).result(struct(variables))
+    # rubocop:disable Layout/LineLength
+    (config["commands.#{name}"] || YAML.safe_load(config_path.dup.join("#{name}.yml").read)).map do |arg|
+      BabyErubis::Text.new.from_str(arg.to_s).render(self.variables.merge(variables))
     end.yield_self do |args|
       return Alluvion::Synchro::Sequence::Command.new(args, path: path)
     end
-  end
-
-  # @return [OpenStruct]
-  def struct(variables = {})
-    OpenStruct.new(self.variables.merge(variables)).instance_eval { binding }
+    # rubocop:enable Layout/LineLength
   end
 
   # @param [Symbol] direction
@@ -156,8 +151,8 @@ class Alluvion::Synchro::Sequence::Factory
     # @formatter:off
     {
       url: Alluvion::URI.new(self.config['url']),
-      config: self.config.dup
-    }
+      config: self.config.dup,
+    }.yield_self { |vars| self.config.env.merge(vars) }
     # @formatter:on
   end
 end

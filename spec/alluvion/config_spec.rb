@@ -68,3 +68,20 @@ describe Alluvion::Config, :'alluvion/config' do
   end
 end
 # rubocop:enable Metrics/BlockLength
+
+# retrieve env from config ------------------------------------------
+describe Alluvion::Config, :'alluvion/config' do
+  # sham!(:samples).configs.fetch('complete').tap do |sample|
+  sham!(:config_envs).user.tap do |env|
+    let(:config) { sham!(:configs).user }
+    subject { described_class.new(config, env: env) }
+
+    env.each do |k, v|
+      "user.#{k}".tap do |key|
+        context ".[#{key.inspect}]" do
+          it { expect(subject[key]).to eq(v) }
+        end
+      end
+    end
+  end
+end
