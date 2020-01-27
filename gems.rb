@@ -4,6 +4,7 @@
 source 'https://rubygems.org'
 
 group :default do
+  gem 'baby_erubis', '~> 2.2'
   gem 'kamaze-version', '~> 1.0'
   gem 'mimemagic', '~> 0.3'
   gem 'sys-proc', '~> 1.1'
