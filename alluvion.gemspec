@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
    .flatten
    .push(*s.executables.map { |f| [s.bindir, f].join("/") })
 
+  s.add_runtime_dependency("baby_erubis", ["~> 2.2"])
   s.add_runtime_dependency("kamaze-version", ["~> 1.0"])
   s.add_runtime_dependency("mimemagic", ["~> 0.3"])
   s.add_runtime_dependency("sys-proc", ["~> 1.1"])
