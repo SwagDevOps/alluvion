@@ -58,9 +58,8 @@ describe Alluvion::Config, :'alluvion/config' do
       'paths.remote' => Hash,
       'paths.remote.todo' => String,
       'paths.remote.done' => String,
-    }.
+    }.each do |k, type|
       # @formatter:on
-      each do |k, type|
       context "#[#{k.inspect}]" do
         it { expect(subject[k]).to be_a(type) }
       end
@@ -71,12 +70,20 @@ end
 
 # retrieve env from config ------------------------------------------
 describe Alluvion::Config, :'alluvion/config' do
-  # sham!(:samples).configs.fetch('complete').tap do |sample|
   sham!(:config_envs).user.tap do |env|
     let(:config) { sham!(:configs).user }
     subject { described_class.new(config, env: env) }
 
     env.each do |k, v|
+      # esnure consistency ------------------------------------------
+      context ".env[#{k.inspect}]" do
+        it do
+          expect(subject.env[k]).to_not eq(nil)
+          expect(subject.env[k]).to eq(v)
+        end
+      end
+
+      # ensure template evaluation ----------------------------------
       "user.#{k}".tap do |key|
         context ".[#{key.inspect}]" do
           it { expect(subject[key]).to eq(v) }
