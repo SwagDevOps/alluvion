@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 autoload(:SecureRandom, 'securerandom')
+autoload(:Etc, 'etc')
 
 # @formatter:off
 # noinspection RubyStringKeysInHashInspection
@@ -26,12 +27,21 @@ autoload(:SecureRandom, 'securerandom')
         'todo' => '/var/user/todo',
       }
     }
+  },
+  user: {
+    'user' => {
+      'HOME' => '<%= @HOME %>',
+      'UID' => '<%= @UID %>',
+      'USER' => '<%= @USER %>',
+      'SECRET' => '<%= @SECRET %>',
+    }
   }
 }.yield_self do |config|
   Sham.config(FactoryStruct, :configs) do |c|
     c.attributes do
       {
-        complete: config[:complete]
+        complete: config[:complete],
+        user: config[:user],
       }
     end
   end
