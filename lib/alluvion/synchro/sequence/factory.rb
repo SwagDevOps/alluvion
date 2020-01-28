@@ -14,7 +14,6 @@ require_relative '../sequence'
 # ``Array<Alluvion::Synchro::Command>``.
 #
 class Alluvion::Synchro::Sequence::Factory
-  autoload(:BabyErubis, 'baby_erubis')
   autoload(:YAML, 'yaml')
 
   # @param [Hash{String => Object}|Alluvion::Config] config
@@ -103,7 +102,7 @@ class Alluvion::Synchro::Sequence::Factory
   def load_command(name, path, variables = {})
     # rubocop:disable Layout/LineLength
     (config["commands.#{name}"] || YAML.safe_load(config_path.dup.join("#{name}.yml").read)).map do |arg|
-      BabyErubis::Text.new.from_str(arg.to_s).render(self.variables.merge(variables))
+      Alluvion::Template.new(arg.to_s).call(self.variables.merge(variables))
     end.yield_self do |args|
       return Alluvion::Synchro::Sequence::Command.new(args, path: path)
     end
