@@ -21,6 +21,7 @@ module Alluvion
     Host: 'host',
     Shell: 'shell',
     Synchro: 'synchro',
+    Template: 'template',
     URI: 'uri'
   }.each do |s, fp|
     autoload(:Pathname, 'pathname')
