@@ -11,5 +11,6 @@ describe Alluvion, :alluvion do
   it { expect(described_class).to be_const_defined(:Host) }
   it { expect(described_class).to be_const_defined(:Shell) }
   it { expect(described_class).to be_const_defined(:Synchro) }
+  it { expect(described_class).to be_const_defined(:Template) }
   it { expect(described_class).to be_const_defined(:URI) }
 end
