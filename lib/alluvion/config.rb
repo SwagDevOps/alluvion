@@ -50,7 +50,6 @@ class Alluvion::Config < Hash
 
   class << self
     autoload(:YAML, 'yaml')
-    autoload(:BabyErubis, 'baby_erubis')
 
     # @param [String] filepath
     #
@@ -69,7 +68,7 @@ class Alluvion::Config < Hash
     def template(value, env: self.env)
       return value unless value.is_a?(String)
 
-      BabyErubis::Text.new.from_str(value.to_s).render(env).yield_self do |v|
+      Alluvion::Template.new(value.to_s).call(env).yield_self do |v|
         YAML.safe_load(v)
       rescue Psych::Exception
         v
