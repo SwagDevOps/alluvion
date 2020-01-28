@@ -12,19 +12,27 @@ require_relative '../alluvion'
 class Alluvion::Template
   autoload(:BabyErubis, 'baby_erubis')
 
+  # @param [String] value
   def initialize(value)
     @origin = value.to_s
   end
 
+  # Rendder template with given context.
+  #
+  # @param [Hash] context
+  # @return [String]
   def render(context = {})
     renderer.render(context)
   end
+
+  alias call render
 
   protected
 
   # @return [String]
   attr_reader :origin
 
+  # @return [BabyErubis::Template]
   def renderer
     BabyErubis::Text.new.from_str(origin)
   end
