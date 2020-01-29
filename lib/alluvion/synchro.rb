@@ -45,6 +45,8 @@ class Alluvion::Synchro
   # @return [Hash{Symbol => Synchro::Sequence}]
   attr_reader :sequences
 
+  # Acquire lock with given filepath before executing given block.
+  #
   # @param [String] filepath
   #
   # @raise [Alluvion::FileLock::Error]
@@ -52,6 +54,7 @@ class Alluvion::Synchro
     Alluvion::FileLock.new(filepath).call { block.call }
   end
 
+  # Ensure connection is available before executing given block.
   def with_connection(&block)
     Alluvion::URI.new(config['url']).tap do |uri|
       unless uri.host.port_open?(uri.port, timeout: config['timeout'] || 1)
