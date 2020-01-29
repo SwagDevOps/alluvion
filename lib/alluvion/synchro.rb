@@ -28,8 +28,10 @@ class Alluvion::Synchro
   #
   # @raise [RuntimeError] when connection is not available
   def call(direction)
-    sequences.fetch(direction.to_sym).tap do |sequence|
-      with_connection { sequence.call }
+    with_lock(config["locks.#{direction}"]) do
+      sequences.fetch(direction.to_sym).tap do |sequence|
+        with_connection { sequence.call }
+      end
     end
   end
 
@@ -42,6 +44,13 @@ class Alluvion::Synchro
   #
   # @return [Hash{Symbol => Synchro::Sequence}]
   attr_reader :sequences
+
+  # @param [String] filepath
+  #
+  # @raise [Alluvion::FileLock::Error]
+  def with_lock(filepath, &block)
+    Alluvion::FileLock.new(filepath).call { block.call }
+  end
 
   def with_connection(&block)
     Alluvion::URI.new(config['url']).tap do |uri|
