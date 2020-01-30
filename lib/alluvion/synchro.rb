@@ -11,7 +11,6 @@ require_relative '../alluvion'
 # Describe a synchro
 class Alluvion::Synchro
   autoload(:Pathname, 'pathname')
-  autoload(:Etc, 'etc')
 
   # @formatter:off
   {
