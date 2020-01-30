@@ -10,6 +10,9 @@ require_relative '../alluvion'
 
 # Describe a synchro
 class Alluvion::Synchro
+  autoload(:Pathname, 'pathname')
+  autoload(:Etc, 'etc')
+
   # @formatter:off
   {
     Sequence: 'sequence',
@@ -62,6 +65,24 @@ class Alluvion::Synchro
       end
 
       return block.call
+    end
+  end
+
+  # Get paths for default lock files.
+  #
+  # @return [Hash{Symbol => Pathname}]
+  def lock_files
+    require 'dry/inflector'
+    require 'tmpdir' unless Dir.respond_to?(:tmpdir)
+
+    Pathname.new(Dir.tmpdir).yield_self do |tmpdir|
+      Dry::Inflector.new.underscore(self.class.name.split('::').first).yield_self do |name| # rubocop:disable Layout/LineLength
+        # @formatter:off
+        return [:up, :down].map do |direction|
+          [direction, tmpdir.join([name, ENV['UID'] || Process.uid, direction, 'lock'].join('.'))] # rubocop:disable Layout/LineLength
+        end.to_h
+        # @formatter:on
+      end
     end
   end
 end
