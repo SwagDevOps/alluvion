@@ -60,7 +60,7 @@ class Alluvion::Synchro
   def with_connection(&block)
     Alluvion::URI.new(config['url']).tap do |uri|
       unless uri.host.port_open?(uri.port, timeout: config['timeout'] || 1)
-        raise "Can not connect to #{uri.to_s.inspect}"
+        raise "can not connect to #{uri.to_s.inspect}"
       end
 
       return block.call

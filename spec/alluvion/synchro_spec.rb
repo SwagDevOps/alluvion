@@ -22,7 +22,7 @@ describe Alluvion::Synchro, :'alluvion/synchro' do
     context "#call(#{direction.inspect})" do
       it do
         # rubocop:disable Metrics/LineLength
-        %r{^Can not connect to "[a-z]+://[a-z]+@[a-z]+.[a-z]+:[0-9]+"$}.tap do |msg|
+        %r{^can not connect to "[a-z]+://[a-z]+@[a-z]+.[a-z]+:[0-9]+"$}.tap do |msg|
           expect { subject.call(direction) }.to raise_error(RuntimeError).with_message(msg)
         end
         # rubocop:enable Metrics/LineLength
