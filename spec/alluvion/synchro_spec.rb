@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'tmpdir'
+autoload(:Pathname, 'pathname')
+
 # constants ---------------------------------------------------------
 describe Alluvion::Synchro, :'alluvion/synchro' do
   it { expect(described_class).to be_const_defined(:Sequence) }
@@ -16,7 +19,7 @@ describe Alluvion::Synchro, :'alluvion/synchro' do
   let(:subject) { described_class.new(sham!(:configs).complete) }
 
   [:up, :down].sort.each do |direction|
-    context ".call(#{direction.inspect})" do
+    context "#call(#{direction.inspect})" do
       it do
         # rubocop:disable Metrics/LineLength
         %r{^Can not connect to "[a-z]+://[a-z]+@[a-z]+.[a-z]+:[0-9]+"$}.tap do |msg|
@@ -24,6 +27,26 @@ describe Alluvion::Synchro, :'alluvion/synchro' do
         end
         # rubocop:enable Metrics/LineLength
       end
+    end
+  end
+end
+
+# lock_files ------------------------------------------------------------------
+describe Alluvion::Synchro, :'alluvion/synchro' do
+  let(:subject) { described_class.new(sham!(:configs).complete) }
+
+  context '#lock_files' do
+    it { expect(subject.__send__(:lock_files)).to be_a(Hash) }
+  end
+
+  [:up, :down].each do |direction|
+    context "#lock_files[#{direction.inspect}]" do
+      # rubocop:disable Layout/LineLength
+      let(:expected) { Pathname(Dir.tmpdir).join("alluvion.#{Process.uid}.#{direction}.lock") }
+      # rubocop:enable Layout/LineLength
+
+      it { expect(subject.__send__(:lock_files)[direction]).to be_a(Pathname) }
+      it { expect(subject.__send__(:lock_files)[direction]).to eq(expected) }
     end
   end
 end
