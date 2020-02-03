@@ -30,7 +30,7 @@ class Alluvion::Synchro
   #
   # @raise [RuntimeError] when connection is not available
   def call(direction)
-    with_lock(config["locks.#{direction}"]) do
+    with_lock(direction) do
       sequences.fetch(direction.to_sym).tap do |sequence|
         with_connection { sequence.call }
       end
@@ -49,11 +49,13 @@ class Alluvion::Synchro
 
   # Acquire lock with given filepath before executing given block.
   #
-  # @param [String] filepath
+  # @param [Symbol] direction
   #
   # @raise [Alluvion::FileLock::Error]
-  def with_lock(filepath, &block)
-    Alluvion::FileLock.new(filepath).call { block.call }
+  def with_lock(direction, &block)
+    (config["locks.#{direction}"] || lock_files.fetch(direction)).yield_self do |filepath| # rubocop:disable Layout/LineLength
+      Alluvion::FileLock.new(filepath).call { block.call }
+    end
   end
 
   # Ensure connection is available before executing given block.
