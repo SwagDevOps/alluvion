@@ -5,7 +5,7 @@ autoload(:Pathname, 'pathname')
 # rubocop:disable Layout/LineLength
 describe Alluvion::FileLock, :'alluvion/file_lock' do
   let(:subject) do
-    sham!(:configs).complete['locks']['up'].yield_self do |file|
+    sham!(:configs).complete['locks']['todo'].yield_self do |file|
       described_class.new(file)
     end
   end
@@ -28,7 +28,7 @@ end
 # Examples for locking -----------------------------------------------
 describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#call' do
   let(:subject) do
-    sham!(:configs).complete['locks']['up'].yield_self do |file|
+    sham!(:configs).complete['locks']['todo'].yield_self do |file|
       described_class.new(file)
     end
   end
@@ -48,10 +48,11 @@ describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#call' d
   end
 end
 
+# rubocop:disable Metrics/BlockLength
 describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#parallel' do
-  let(:subject) do
-    sham!(:configs).complete['locks']['up'].yield_self { |file| described_class.new(file) }
-  end
+  let(:lock_name) { 'todo' }
+  let(:lock_file) { sham!(:configs).complete['locks'][lock_name] }
+  let(:subject) { described_class.new(lock_file) }
 
   let(:locker) do
     lambda do |subject, &block|
@@ -70,12 +71,15 @@ describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#paralle
     { call: 0.01 }.each do |method, duration|
       context "##{method}" do
         it 'in parallel run' do
-          expect do
-            locker.call(subject) { subject.public_send(method, &-> { sleep(duration) }) }
-          end.to raise_error(Alluvion::FileLock::Error).with_message('can not acquire lock (up)')
+          "can not acquire lock (#{lock_name})".tap do |expected_message|
+            expect do
+              locker.call(subject) { subject.public_send(method, &-> { sleep(duration) }) }
+            end.to raise_error(Alluvion::FileLock::Error).with_message(expected_message)
+          end
         end
       end
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
 # rubocop:enable Layout/LineLength

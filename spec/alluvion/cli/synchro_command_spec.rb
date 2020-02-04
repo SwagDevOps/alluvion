@@ -15,7 +15,7 @@ end
 
 # instance methods --------------------------------------------------
 describe Alluvion::Cli::SynchroCommand, :'alluvion/cli/synchro_command' do
-  [:up, :down].each do |command|
+  [:done, :todo].each do |command|
     it { expect(subject).to respond_to(command).with(0).arguments }
   end
 end

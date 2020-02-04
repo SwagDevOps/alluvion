@@ -5,8 +5,8 @@ todo:
   extensions: ['torrent']
   mime_types: ['application/x-bittorrent']
 locks:
-  up: '/tmp/alluvion/up.lock'
-  down: '/tmp/alluvion/down.lock'
+  todo: '/tmp/alluvion/todo.lock'
+  done: '/tmp/alluvion/done.lock'
 paths:
   local:
     done: '/data/complete'

@@ -28,19 +28,19 @@ class Alluvion::Cli::SynchroCommand < Alluvion::Cli::Command
     end
   end
 
-  desc 'up', 'Execute synchro (up)'
+  desc 'todo', 'Execute synchro (up)'
   config_option_args.tap { |args| option(args[0], **args[1]) }
 
   # @see Alluvion.Synchro#up
-  def up
+  def todo
     configure(options).yield_self { synchro.call(__method__) }
   end
 
-  desc 'down', 'Execute synchro (down)'
+  desc 'done', 'Execute synchro (down)'
   config_option_args.tap { |args| option(args[0], **args[1]) }
 
   # @see Alluvion::Synchro#down
-  def down
+  def done
     configure(options).yield_self { synchro.call(__method__) }
   end
 

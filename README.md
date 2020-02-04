@@ -3,8 +3,8 @@
 ```
 Commands:
   alluvion help [COMMAND]  # Describe available commands or one specific command
-  alluvion synchro:down    # Execute synchro (down)
-  alluvion synchro:up      # Execute synchro (up)
+  alluvion synchro:done    # Execute synchro (down)
+  alluvion synchro:todo    # Execute synchro (up)
 ```
 
 ## Requirements

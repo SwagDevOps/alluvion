@@ -21,7 +21,7 @@ class Alluvion::Synchro
   # @param [Hash|Alluvion::Config] config
   def initialize(config)
     @config = Alluvion::Config.new(config)
-    @sequences = [:up, :down].sort.map do |direction|
+    @sequences = [:done, :todo].sort.map do |direction|
       [direction, Alluvion::Synchro::Sequence.build(direction, self.config)]
     end.to_h
   end
@@ -79,7 +79,7 @@ class Alluvion::Synchro
     Pathname.new(Dir.tmpdir).yield_self do |tmpdir|
       Dry::Inflector.new.underscore(self.class.name.split('::').first).yield_self do |name| # rubocop:disable Layout/LineLength
         # @formatter:off
-        return [:up, :down].map do |direction|
+        return [:done, :todo].map do |direction|
           [direction, tmpdir.join([name, ENV['UID'] || Process.uid, direction, 'lock'].join('.'))] # rubocop:disable Layout/LineLength
         end.to_h
         # @formatter:on

@@ -14,8 +14,8 @@ autoload(:Etc, 'etc')
       'mime_types' => ['application/x-bittorrent'],
     },
     'locks' => {
-      'up' => SPEC_DIR.join('temp/lock/up.lock'),
-      'down' => SPEC_DIR.join('temp/lock/down.lock'),
+      'todo' => SPEC_DIR.join('temp/lock/todo.lock'),
+      'done' => SPEC_DIR.join('temp/lock/done.lock'),
     },
     'paths' => {
       'local' => {

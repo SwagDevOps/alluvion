@@ -16,9 +16,9 @@ describe Alluvion::Synchro::Sequence, :'alluvion/synchro/sequence' do
 end
 
 # .build() minimal examples (with directions) ---------------------------------
-[:up, :down].each do |direction|
+[:done, :todo].each do |direction|
   describe Alluvion::Synchro::Sequence, :'alluvion/synchro/sequence' do
-    context '.build(:up, config)' do
+    context ".build(#{direction.inspect}, config)" do
       sham!(:configs).complete.tap do |config|
         subject { described_class.build(direction, config) }
       end

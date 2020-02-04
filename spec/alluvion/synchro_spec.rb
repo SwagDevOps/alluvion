@@ -18,7 +18,7 @@ end
 describe Alluvion::Synchro, :'alluvion/synchro' do
   let(:subject) { described_class.new(sham!(:configs).complete) }
 
-  [:up, :down].sort.each do |direction|
+  [:done, :todo].each do |direction|
     context "#call(#{direction.inspect})" do
       it do
         # rubocop:disable Metrics/LineLength
@@ -39,7 +39,7 @@ describe Alluvion::Synchro, :'alluvion/synchro' do
     it { expect(subject.__send__(:lock_files)).to be_a(Hash) }
   end
 
-  [:up, :down].each do |direction|
+  [:done, :todo].each do |direction|
     context "#lock_files[#{direction.inspect}]" do
       # rubocop:disable Layout/LineLength
       let(:expected) { Pathname(Dir.tmpdir).join("alluvion.#{Process.uid}.#{direction}.lock") }

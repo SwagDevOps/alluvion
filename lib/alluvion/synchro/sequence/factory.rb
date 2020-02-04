@@ -10,7 +10,7 @@ require_relative '../sequence'
 
 # Describe commands
 #
-# Commands are indexed by direction up/down as sequences:
+# Commands are indexed as sequences:
 # ``Array<Alluvion::Synchro::Command>``.
 #
 class Alluvion::Synchro::Sequence::Factory
@@ -109,34 +109,34 @@ class Alluvion::Synchro::Sequence::Factory
     # rubocop:enable Layout/LineLength
   end
 
-  # @param [Symbol] direction
+  # @param [Symbol] type
   # @param [String|Symbol] path_id
   # @raise [ArgumentError]
   #
   # @return [Hash{Symbol => Array<Alluvion::Synchro::Command>}]
-  def make_commands(direction, path_id)
-    self.config["paths.local.#{path_id}"].tap do |path|
+  def make_commands(type)
+    self.config["paths.local.#{type}"].tap do |path|
       return nil unless path
 
-      return [load_command(direction, path)] if direction == :down
+      return [load_command(type, path)] if type == :done
 
-      if direction == :up
+      if type == :todo
         return todos.map do |fname|
           # rubocop:disable Layout/LineLength
-          { file: fname }.yield_self { |variables| load_command(direction, path, variables) }
+          { file: fname }.yield_self { |variables| load_command(type, path, variables) }
           # rubocop:enable Layout/LineLength
         end
       end
     end
 
-    raise ArgumentError, "invalid direction #{direction.inspect}"
+    raise ArgumentError, "invalid direction #{type.inspect}"
   end
 
   # @return [Hash]
   def make_sequences
     {}.tap do |sequences|
-      { down: :done, up: :todo }.each do |k, path|
-        sequences[k] = make_commands(k, path)&.yield_self do |commands|
+      [:done, :todo].each do |type|
+        sequences[type] = make_commands(type)&.yield_self do |commands|
           Alluvion::Synchro::Sequence.new(commands)
         end
       end
