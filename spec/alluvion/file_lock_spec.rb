@@ -4,7 +4,7 @@ autoload(:Pathname, 'pathname')
 
 # rubocop:disable Layout/LineLength
 describe Alluvion::FileLock, :'alluvion/file_lock' do
-  let(:subject) do
+  subject do
     sham!(:configs).complete['locks']['todo'].yield_self do |file|
       described_class.new(file)
     end
@@ -27,7 +27,7 @@ end
 
 # Examples for locking -----------------------------------------------
 describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#call' do
-  let(:subject) do
+  subject do
     sham!(:configs).complete['locks']['todo'].yield_self do |file|
       described_class.new(file)
     end
@@ -35,8 +35,6 @@ describe Alluvion::FileLock, :'alluvion/file_lock', :'alluvion/file_lock#call' d
 
   [:lock!, :call].each do |method_name|
     context "##{method_name}" do
-      after(:each) { subject.unlock }
-
       sham!(:generators).counter.call(10).each do |v|
         it { expect(subject.public_send(method_name, &-> { v })).to be(v) }
       end
