@@ -6,6 +6,7 @@
 /cache/
 /coverage/
 /doc/
+/spec/temp/
 /vendor/
 !/.env
 !/.gitignore
