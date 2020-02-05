@@ -55,11 +55,11 @@ class Alluvion::URI < String
   end
 
   def method_missing(method_name, *arguments, &block)
-    # rubocop:disable Metrics/LineLength
+    # rubocop:disable Layout/LineLength
     return to_uri.public_send(method_name, *arguments) if respond_to_missing?(method_name)
 
     super
-    # rubocop:enable Metrics/LineLength
+    # rubocop:enable Layout/LineLength
   end
 
   class << self
