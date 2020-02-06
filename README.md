@@ -19,11 +19,11 @@ Alluvion uses ``rsync`` (as default) to synchronize files.
 url: 'ssh://user@example.org:22'
 paths:
   local:
-    done: '/tmp/alluvion/complete'
-    todo: '/home/dimitri/Desktop/alluvion/spec/samples/files'
+    done: '/var/alluvion/done'
+    todo: '/var/alluvion/todo'
   remote:
-    done: '/var/torrents/complete'
-    todo: '/tmp/todo'
+    done: '/var/alluvion/done'
+    todo: '/var/alluvion/todo'
 ```
 
 ### Environment
