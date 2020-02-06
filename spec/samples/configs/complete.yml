@@ -1,0 +1,16 @@
+---
+url: 'ssh://user@example.org:22'
+timeout: 0.5
+todo:
+  extensions: ['torrent']
+  mime_types: ['application/x-bittorrent']
+locks:
+  todo: '/tmp/alluvion/todo.lock'
+  done: '/tmp/alluvion/done.lock'
+paths:
+  local:
+    done: '/data/complete'
+    todo: '/data/todo'
+  remote:
+    done: '/var/user/complete'
+    todo: '/var/user/todo'

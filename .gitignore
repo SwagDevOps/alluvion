@@ -1,0 +1,16 @@
+/**/*.gem
+/**/*.swp
+/**/*~
+/**/.*
+/build/
+/cache/
+/coverage/
+/doc/
+/spec/temp/
+/vendor/
+!/.env
+!/.gitignore
+!/.rspec
+!/.rubocop.yml
+!/.solargraph.yml
+!/.yardopts
