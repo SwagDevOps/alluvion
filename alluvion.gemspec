@@ -6,7 +6,7 @@
 Gem::Specification.new do |s|
   s.name        = "alluvion"
   s.version     = "1.0.0"
-  s.date        = "2019-11-06"
+  s.date        = "2020-02-06"
   s.summary     = "Synchro for torrents"
   s.description = "A simple synchro for torrents"
 
