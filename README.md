@@ -32,7 +32,7 @@ Config supports environment variables, using ERB-like syntax:
 
 ```yaml
 url: 'ssh://<%= @SYNCHRO_USER%>@<%= @SYNCHRO_HOST%>:22'
-timeout: <%= @SYNCHRO_TIMEOUT || 5 %>
+timeout: <%= ENV['SYNCHRO_TIMEOUT']&.to_i || 5 %>
 paths:
   local:
     done: '<%= @SYNCHRO_VOLUME %>/done'
