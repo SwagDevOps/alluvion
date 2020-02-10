@@ -13,8 +13,8 @@ end
 
 group :development do
   gem 'kamaze-project', '~> 1.0', '>= 1.0.3'
-  gem 'listen', '~> 3.1'
-  gem 'rubocop', '~> 0.72'
+  gem 'listen', '~> 3.2'
+  gem 'rubocop', '~> 0.79'
 end
 
 group :repl do
@@ -25,13 +25,13 @@ end
 
 group :doc do
   gem 'github-markup', '~> 3.0'
-  gem 'redcarpet', '~> 3.4'
+  gem 'redcarpet', '~> 3.5'
   gem 'yard', '~> 0.9'
   gem 'yard-coderay', '~> 0.1'
 end
 
 group :test do
-  gem 'rspec', '~> 3.8'
+  gem 'rspec', '~> 3.9'
   gem 'sham', '~> 2.0'
-  gem 'simplecov', '~> 0.16'
+  gem 'simplecov', '~> 0.18'
 end
